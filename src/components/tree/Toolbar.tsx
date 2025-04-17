@@ -4,7 +4,7 @@ import { Save, Download, Share2 } from 'lucide-react';
 const Toolbar = () => {
   return (
     <div className="bg-background border-b border-border p-4 flex justify-between items-center">
-      <div className="font-heading text-xl">Семейное древо</div>
+      <div className="font-heading text-xl">Семейные корни</div>
       <div className="flex gap-2">
         <Button 
           variant="outline" 

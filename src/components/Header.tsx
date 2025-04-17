@@ -13,7 +13,7 @@ const Header = () => {
           <div className="w-10 h-10 flex items-center justify-center bg-secondary rounded-full">
             <span className="text-secondary-foreground font-heading text-xl">🌳</span>
           </div>
-          <span className="font-heading text-xl font-medium">СемьяДрево</span>
+          <span className="font-heading text-xl font-medium">Семейные корни</span>
         </Link>
 
         {/* Десктопное меню */}
