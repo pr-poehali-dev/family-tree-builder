@@ -21,7 +21,6 @@ const Header = () => {
           <Link to="/" className="font-medium hover:text-primary transition-colors">Главная</Link>
           <Link to="/create" className="font-medium hover:text-primary transition-colors">Создать древо</Link>
           <Link to="/education" className="font-medium hover:text-primary transition-colors">Обучение</Link>
-          <Link to="/demo" className="font-medium hover:text-primary transition-colors">Демо</Link>
           <Link to="/archives" className="font-medium hover:text-primary transition-colors">Архивы</Link>
           <Link to="/support" className="font-medium hover:text-primary transition-colors">Поддержка</Link>
           <div className="flex gap-2">
@@ -66,13 +65,6 @@ const Header = () => {
               onClick={() => setMobileMenuOpen(false)}
             >
               Обучение
-            </Link>
-            <Link 
-              to="/demo" 
-              className="font-medium hover:text-primary transition-colors p-2"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Демо
             </Link>
             <Link 
               to="/archives" 

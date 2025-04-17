@@ -1,30 +1,156 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { ChevronRight, Info } from 'lucide-react';
 
 const Hero = () => {
+  const scrollToFeatures = () => {
+    const featuresSection = document.getElementById('features');
+    if (featuresSection) {
+      featuresSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
-    <section className="relative py-16 md:py-24 overflow-hidden">
-      {/* Декоративный фоновый элемент */}
-      <div className="absolute inset-0 -z-10 opacity-10 bg-[url('/placeholder.svg')] bg-no-repeat bg-center bg-contain"></div>
-      
-      <div className="container mx-auto">
-        <div className="max-w-3xl mx-auto text-center">
-          <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            Сохраните историю вашей семьи
-          </h1>
-          <p className="text-lg md:text-xl mb-8">
-            Создайте цифровое древо, исследуйте архивы и делитесь воспоминаниями с близкими.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" className="hero-button">
-              <Link to="/signup">Начать бесплатно</Link>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="hero-button-outline">
-              <Link to="/about">Узнать больше</Link>
-            </Button>
+    <section className="relative overflow-hidden py-20 md:py-32 bg-background">
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <div>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+              Откройте историю <span className="text-primary">своей семьи</span>
+            </h1>
+            <p className="text-xl text-muted-foreground mb-8 max-w-xl">
+              Сервис «Семейные корни» поможет вам создать подробное семейное древо, 
+              сохранить важные воспоминания и открыть новые страницы истории вашего рода.
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <Button asChild size="lg">
+                <Link to="/signup">
+                  Начать бесплатно
+                  <ChevronRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <Button variant="outline" size="lg" onClick={scrollToFeatures}>
+                <Info className="mr-2 h-5 w-5" />
+                Узнать больше
+              </Button>
+            </div>
+          </div>
+          
+          <div className="relative">
+            <div className="w-full aspect-square md:aspect-[4/5] relative">
+              <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-secondary/10 rounded-lg"></div>
+              <div className="relative w-full h-full flex items-center justify-center">
+                <div className="family-tree-visual w-[90%] h-[90%] relative">
+                  <div className="interactive-node absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+                                w-20 h-20 bg-background border-2 border-primary rounded-full
+                                flex items-center justify-center cursor-pointer
+                                hover:scale-110 transition-transform duration-300
+                                shadow-lg z-30">
+                    <span className="font-medium text-center">Вы</span>
+                  </div>
+                  
+                  {/* Родители */}
+                  <div className="interactive-node absolute top-[15%] left-[35%] transform -translate-x-1/2 -translate-y-1/2
+                                w-16 h-16 bg-background border-2 border-primary/80 rounded-full
+                                flex items-center justify-center cursor-pointer
+                                hover:scale-110 transition-transform duration-300
+                                shadow-md z-20">
+                    <span className="font-medium text-sm">Мама</span>
+                  </div>
+                  
+                  <div className="interactive-node absolute top-[15%] left-[65%] transform -translate-x-1/2 -translate-y-1/2
+                                w-16 h-16 bg-background border-2 border-primary/80 rounded-full
+                                flex items-center justify-center cursor-pointer
+                                hover:scale-110 transition-transform duration-300
+                                shadow-md z-20">
+                    <span className="font-medium text-sm">Папа</span>
+                  </div>
+                  
+                  {/* Прародители */}
+                  <div className="interactive-node absolute top-[5%] left-[25%] transform -translate-x-1/2 -translate-y-1/2
+                                w-12 h-12 bg-background border border-primary/60 rounded-full
+                                flex items-center justify-center cursor-pointer
+                                hover:scale-110 transition-transform duration-300
+                                shadow-sm z-10">
+                    <span className="font-medium text-xs">Бабушка</span>
+                  </div>
+                  
+                  <div className="interactive-node absolute top-[5%] left-[45%] transform -translate-x-1/2 -translate-y-1/2
+                                w-12 h-12 bg-background border border-primary/60 rounded-full
+                                flex items-center justify-center cursor-pointer
+                                hover:scale-110 transition-transform duration-300
+                                shadow-sm z-10">
+                    <span className="font-medium text-xs">Дедушка</span>
+                  </div>
+                  
+                  <div className="interactive-node absolute top-[5%] left-[55%] transform -translate-x-1/2 -translate-y-1/2
+                                w-12 h-12 bg-background border border-primary/60 rounded-full
+                                flex items-center justify-center cursor-pointer
+                                hover:scale-110 transition-transform duration-300
+                                shadow-sm z-10">
+                    <span className="font-medium text-xs">Бабушка</span>
+                  </div>
+                  
+                  <div className="interactive-node absolute top-[5%] left-[75%] transform -translate-x-1/2 -translate-y-1/2
+                                w-12 h-12 bg-background border border-primary/60 rounded-full
+                                flex items-center justify-center cursor-pointer
+                                hover:scale-110 transition-transform duration-300
+                                shadow-sm z-10">
+                    <span className="font-medium text-xs">Дедушка</span>
+                  </div>
+                  
+                  {/* Дети */}
+                  <div className="interactive-node absolute top-[75%] left-[40%] transform -translate-x-1/2 -translate-y-1/2
+                                w-16 h-16 bg-background border-2 border-primary/80 rounded-full
+                                flex items-center justify-center cursor-pointer
+                                hover:scale-110 transition-transform duration-300
+                                shadow-md z-20">
+                    <span className="font-medium text-sm">Дочь</span>
+                  </div>
+                  
+                  <div className="interactive-node absolute top-[75%] left-[60%] transform -translate-x-1/2 -translate-y-1/2
+                                w-16 h-16 bg-background border-2 border-primary/80 rounded-full
+                                flex items-center justify-center cursor-pointer
+                                hover:scale-110 transition-transform duration-300
+                                shadow-md z-20">
+                    <span className="font-medium text-sm">Сын</span>
+                  </div>
+                  
+                  {/* Линии связей */}
+                  <svg className="absolute inset-0 w-full h-full z-0" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    {/* Линии к родителям */}
+                    <path d="M50,50 L35,15" stroke="currentColor" className="text-primary/60" strokeWidth="1" fill="none" />
+                    <path d="M50,50 L65,15" stroke="currentColor" className="text-primary/60" strokeWidth="1" fill="none" />
+                    
+                    {/* Линии к прародителям */}
+                    <path d="M35,15 L25,5" stroke="currentColor" className="text-primary/40" strokeWidth="0.75" fill="none" />
+                    <path d="M35,15 L45,5" stroke="currentColor" className="text-primary/40" strokeWidth="0.75" fill="none" />
+                    <path d="M65,15 L55,5" stroke="currentColor" className="text-primary/40" strokeWidth="0.75" fill="none" />
+                    <path d="M65,15 L75,5" stroke="currentColor" className="text-primary/40" strokeWidth="0.75" fill="none" />
+                    
+                    {/* Линии к детям */}
+                    <path d="M50,50 L40,75" stroke="currentColor" className="text-primary/60" strokeWidth="1" fill="none" />
+                    <path d="M50,50 L60,75" stroke="currentColor" className="text-primary/60" strokeWidth="1" fill="none" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            
+            {/* Всплывающие подсказки */}
+            <div className="absolute -top-4 -right-4 md:top-10 md:right-10 bg-primary text-primary-foreground p-3 rounded-lg shadow-lg transform rotate-12 hover:rotate-0 transition-all duration-300 cursor-pointer">
+              <p className="text-sm font-medium">Добавить прадеда</p>
+            </div>
+            
+            <div className="absolute bottom-4 left-4 md:bottom-10 md:left-10 bg-secondary text-secondary-foreground p-3 rounded-lg shadow-lg transform -rotate-6 hover:rotate-0 transition-all duration-300 cursor-pointer">
+              <p className="text-sm font-medium">Исследовать архив</p>
+            </div>
           </div>
         </div>
       </div>
+      
+      {/* Декоративные элементы */}
+      <div className="absolute top-1/4 left-0 w-64 h-64 bg-primary/5 rounded-full filter blur-3xl -z-10"></div>
+      <div className="absolute bottom-1/4 right-0 w-80 h-80 bg-secondary/5 rounded-full filter blur-3xl -z-10"></div>
     </section>
   );
 };
