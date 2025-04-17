@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Link } from 'react-router-dom';
-import { ChevronRight, UserPlus, Users, FileTree } from 'lucide-react';
+import { ChevronRight, UserPlus, Users, GitBranch } from 'lucide-react';
 
 const Demo = () => {
   const [activeTab, setActiveTab] = useState('basic');
@@ -12,7 +12,7 @@ const Demo = () => {
     {
       title: 'Создание простого дерева',
       description: 'Добавьте несколько родственников и создайте свое первое семейное древо',
-      icon: <FileTree className="w-12 h-12 text-primary" />,
+      icon: <GitBranch className="w-12 h-12 text-primary" />,
     },
     {
       title: 'Управление профилями',
