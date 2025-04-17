@@ -23,9 +23,14 @@ const Header = () => {
           <Link to="/education" className="font-medium hover:text-primary transition-colors">Обучение</Link>
           <Link to="/archives" className="font-medium hover:text-primary transition-colors">Архивы</Link>
           <Link to="/support" className="font-medium hover:text-primary transition-colors">Поддержка</Link>
-          <Button asChild variant="default">
-            <Link to="/login">Войти</Link>
-          </Button>
+          <div className="flex gap-2">
+            <Button asChild variant="outline">
+              <Link to="/signup">Регистрация</Link>
+            </Button>
+            <Button asChild variant="default">
+              <Link to="/login">Войти</Link>
+            </Button>
+          </div>
         </nav>
 
         {/* Мобильное меню */}
@@ -75,9 +80,14 @@ const Header = () => {
             >
               Поддержка
             </Link>
-            <Button asChild className="mt-2">
-              <Link to="/login" onClick={() => setMobileMenuOpen(false)}>Войти</Link>
-            </Button>
+            <div className="flex flex-col gap-2 mt-2">
+              <Button asChild variant="outline">
+                <Link to="/signup" onClick={() => setMobileMenuOpen(false)}>Регистрация</Link>
+              </Button>
+              <Button asChild>
+                <Link to="/login" onClick={() => setMobileMenuOpen(false)}>Войти</Link>
+              </Button>
+            </div>
           </nav>
         </div>
       )}
