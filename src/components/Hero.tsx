@@ -1,15 +1,8 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, Info } from 'lucide-react';
+import { ChevronRight, ArchiveIcon } from 'lucide-react';
 
 const Hero = () => {
-  const scrollToFeatures = () => {
-    const featuresSection = document.getElementById('features');
-    if (featuresSection) {
-      featuresSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   return (
     <section className="relative overflow-hidden py-20 md:py-32 bg-background">
       <div className="container mx-auto px-4 relative z-10">
@@ -24,14 +17,16 @@ const Hero = () => {
             </p>
             <div className="flex flex-wrap gap-4">
               <Button asChild size="lg">
-                <Link to="/signup">
-                  Начать бесплатно
+                <Link to="/create-tree">
+                  Построить древо
                   <ChevronRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button variant="outline" size="lg" onClick={scrollToFeatures}>
-                <Info className="mr-2 h-5 w-5" />
-                Узнать больше
+              <Button variant="outline" size="lg" asChild>
+                <Link to="/archives">
+                  <ArchiveIcon className="mr-2 h-5 w-5" />
+                  Найти предка
+                </Link>
               </Button>
             </div>
           </div>
@@ -99,23 +94,6 @@ const Hero = () => {
                     <span className="font-medium text-xs">Дедушка</span>
                   </div>
                   
-                  {/* Дети */}
-                  <div className="interactive-node absolute top-[75%] left-[40%] transform -translate-x-1/2 -translate-y-1/2
-                                w-16 h-16 bg-background border-2 border-primary/80 rounded-full
-                                flex items-center justify-center cursor-pointer
-                                hover:scale-110 transition-transform duration-300
-                                shadow-md z-20">
-                    <span className="font-medium text-sm">Дочь</span>
-                  </div>
-                  
-                  <div className="interactive-node absolute top-[75%] left-[60%] transform -translate-x-1/2 -translate-y-1/2
-                                w-16 h-16 bg-background border-2 border-primary/80 rounded-full
-                                flex items-center justify-center cursor-pointer
-                                hover:scale-110 transition-transform duration-300
-                                shadow-md z-20">
-                    <span className="font-medium text-sm">Сын</span>
-                  </div>
-                  
                   {/* Линии связей */}
                   <svg className="absolute inset-0 w-full h-full z-0" viewBox="0 0 100 100" preserveAspectRatio="none">
                     {/* Линии к родителям */}
@@ -127,22 +105,9 @@ const Hero = () => {
                     <path d="M35,15 L45,5" stroke="currentColor" className="text-primary/40" strokeWidth="0.75" fill="none" />
                     <path d="M65,15 L55,5" stroke="currentColor" className="text-primary/40" strokeWidth="0.75" fill="none" />
                     <path d="M65,15 L75,5" stroke="currentColor" className="text-primary/40" strokeWidth="0.75" fill="none" />
-                    
-                    {/* Линии к детям */}
-                    <path d="M50,50 L40,75" stroke="currentColor" className="text-primary/60" strokeWidth="1" fill="none" />
-                    <path d="M50,50 L60,75" stroke="currentColor" className="text-primary/60" strokeWidth="1" fill="none" />
                   </svg>
                 </div>
               </div>
-            </div>
-            
-            {/* Всплывающие подсказки */}
-            <div className="absolute -top-4 -right-4 md:top-10 md:right-10 bg-primary text-primary-foreground p-3 rounded-lg shadow-lg transform rotate-12 hover:rotate-0 transition-all duration-300 cursor-pointer">
-              <p className="text-sm font-medium">Добавить прадеда</p>
-            </div>
-            
-            <div className="absolute bottom-4 left-4 md:bottom-10 md:left-10 bg-secondary text-secondary-foreground p-3 rounded-lg shadow-lg transform -rotate-6 hover:rotate-0 transition-all duration-300 cursor-pointer">
-              <p className="text-sm font-medium">Исследовать архив</p>
             </div>
           </div>
         </div>

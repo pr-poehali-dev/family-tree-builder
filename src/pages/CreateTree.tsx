@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import Toolbar from '@/components/tree/Toolbar';
 import WorkArea from '@/components/tree/WorkArea';
 import usePersonsData from '@/hooks/usePersonsData';
@@ -46,7 +45,7 @@ const CreateTree = () => {
           onAddRelative={handleAddRelative}
         />
       </main>
-      <Footer />
+      {/* Футер удален согласно требованию */}
     </div>
   );
 };
