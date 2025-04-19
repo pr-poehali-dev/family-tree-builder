@@ -1,24 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import TreeNode from '@/components/TreeNode';
-
-interface Person {
-  id: string;
-  name: string;
-  birthDate?: string;
-  birthPlace?: string;
-  photo?: string;
-  parentIds?: string[];
-  childrenIds?: string[];
-  partnerId?: string;
-  x?: number;
-  y?: number;
-  isSelected?: boolean;
-}
+import { Person, RelationType } from '@/types/person';
 
 interface TreeCanvasProps {
   people: Person[];
   onSelectPerson: (person: Person) => void;
-  onAddRelative: (personId: string, relationType: 'parent' | 'child' | 'partner') => void;
+  onAddRelative: (personId: string, relationType: RelationType) => void;
 }
 
 const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) => {
@@ -68,52 +55,121 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
   // Функция для отрисовки линий связей между людьми
   const renderConnectionLines = () => {
     const lines = [];
+    const NODE_WIDTH = 75;
+    const NODE_HEIGHT = 100;
     
-    // Создаем линии для каждого человека
-    people.forEach(person => {
+    // Создаем линии для отображения связей родитель-ребенок
+    for (const person of people) {
       // Если у человека есть родители, рисуем линии к родителям
       if (person.parentIds && person.parentIds.length > 0) {
-        person.parentIds.forEach(parentId => {
+        for (const parentId of person.parentIds) {
           const parent = people.find(p => p.id === parentId);
           if (parent && parent.x !== undefined && parent.y !== undefined && 
               person.x !== undefined && person.y !== undefined) {
+            
+            // Расчет координат для линии (от центра верха узла-ребенка к центру низа узла-родителя)
+            const childX = person.x + NODE_WIDTH/2;
+            const childY = person.y;
+            const parentX = parent.x + NODE_WIDTH/2;
+            const parentY = parent.y + NODE_HEIGHT;
+            
             lines.push(
-              <line 
-                key={`${person.id}-${parentId}`}
-                x1={person.x + 30} // Центр узла ребенка (ширина узла ~60px)
-                y1={person.y} 
-                x2={parent.x + 30} // Центр узла родителя
-                y2={parent.y + 60} // Нижняя часть узла родителя (высота узла ~60px)
+              <path 
+                key={`parent-${person.id}-${parentId}`}
+                d={`M${childX},${childY} C${childX},${childY-40} ${parentX},${parentY+40} ${parentX},${parentY}`}
                 stroke="var(--primary)" 
+                fill="none"
                 strokeWidth="2"
                 strokeOpacity="0.7"
               />
             );
           }
-        });
+        }
+      }
+      
+      // Если у человека есть дети, но мы еще не отрисовали линии
+      if (person.childrenIds && person.childrenIds.length > 0) {
+        for (const childId of person.childrenIds) {
+          // Проверяем, не было ли уже отрисовано с другой стороны
+          const child = people.find(p => p.id === childId);
+          const alreadyDrawn = child?.parentIds?.includes(person.id);
+          
+          if (!alreadyDrawn && child && child.x !== undefined && child.y !== undefined && 
+              person.x !== undefined && person.y !== undefined) {
+            
+            const parentX = person.x + NODE_WIDTH/2;
+            const parentY = person.y + NODE_HEIGHT;
+            const childX = child.x + NODE_WIDTH/2;
+            const childY = child.y;
+            
+            lines.push(
+              <path 
+                key={`child-${person.id}-${childId}`}
+                d={`M${parentX},${parentY} C${parentX},${parentY+40} ${childX},${childY-40} ${childX},${childY}`}
+                stroke="var(--primary)" 
+                fill="none"
+                strokeWidth="2"
+                strokeOpacity="0.7"
+              />
+            );
+          }
+        }
       }
       
       // Если у человека есть партнер, рисуем горизонтальную линию
       if (person.partnerId) {
         const partner = people.find(p => p.id === person.partnerId);
-        if (partner && partner.x !== undefined && partner.y !== undefined && 
+        // Проверяем, не была ли уже отрисована линия партнерства
+        const alreadyDrawn = partner?.partnerId === person.id && 
+                             people.findIndex(p => p.id === partner.id) < people.findIndex(p => p.id === person.id);
+        
+        if (!alreadyDrawn && partner && partner.x !== undefined && partner.y !== undefined && 
             person.x !== undefined && person.y !== undefined) {
+          
+          // Определяем, кто левее, чтобы правильно нарисовать линию
+          const isPersonLeft = person.x < partner.x;
+          const leftPerson = isPersonLeft ? person : partner;
+          const rightPerson = isPersonLeft ? partner : person;
+          
+          const leftX = leftPerson.x + NODE_WIDTH;
+          const leftY = leftPerson.y + NODE_HEIGHT/2;
+          const rightX = rightPerson.x;
+          const rightY = rightPerson.y + NODE_HEIGHT/2;
+          
           lines.push(
             <line 
-              key={`${person.id}-${partner.id}-partner`}
-              x1={person.x + 60} // Правый край первого узла
-              y1={person.y + 30} // Центр по высоте
-              x2={partner.x} // Левый край второго узла
-              y2={partner.y + 30} // Центр по высоте
+              key={`partner-${person.id}-${partner.id}`}
+              x1={leftX}
+              y1={leftY}
+              x2={rightX}
+              y2={rightY}
               stroke="var(--primary)" 
               strokeWidth="2"
               strokeOpacity="0.7"
               strokeDasharray="4"
             />
           );
+          
+          // Добавим сердечко посередине линии партнерства
+          const heartX = (leftX + rightX) / 2;
+          const heartY = (leftY + rightY) / 2;
+          
+          lines.push(
+            <text
+              key={`heart-${person.id}-${partner.id}`}
+              x={heartX}
+              y={heartY}
+              fontSize="12"
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fill="var(--primary)"
+            >
+              ❤️
+            </text>
+          );
         }
       }
-    });
+    }
     
     return lines;
   };
@@ -150,6 +206,8 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
                 position: 'absolute', 
                 left: person.x || 0, 
                 top: person.y || 0,
+                width: 75, // Фиксированная ширина для узла
+                height: 100, // Фиксированная высота для узла
               }}
             >
               <TreeNode 
@@ -167,12 +225,14 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
         <button 
           className="w-8 h-8 flex items-center justify-center hover:bg-muted rounded-md"
           onClick={() => setScale(prev => Math.min(prev + 0.1, 2))}
+          title="Увеличить"
         >
           +
         </button>
         <button 
           className="w-8 h-8 flex items-center justify-center hover:bg-muted rounded-md"
           onClick={() => setScale(prev => Math.max(prev - 0.1, 0.5))}
+          title="Уменьшить"
         >
           -
         </button>
@@ -182,6 +242,7 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
             setScale(1);
             setPosition({ x: 0, y: 0 });
           }}
+          title="Сбросить масштаб"
         >
           ⟳
         </button>

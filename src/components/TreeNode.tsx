@@ -1,21 +1,13 @@
 import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
-
-interface Person {
-  id: string;
-  name: string;
-  birthDate?: string;
-  birthPlace?: string;
-  photo?: string;
-  isSelected?: boolean;
-}
+import { Plus, User, Users } from 'lucide-react';
+import { Person, RelationType } from '@/types/person';
 
 interface TreeNodeProps {
   person: Person;
   onSelect: (person: Person) => void;
-  onAddRelative: (personId: string, relationType: 'parent' | 'child' | 'partner') => void;
+  onAddRelative: (personId: string, relationType: RelationType) => void;
 }
 
 const TreeNode = ({ person, onSelect, onAddRelative }: TreeNodeProps) => {
@@ -28,11 +20,14 @@ const TreeNode = ({ person, onSelect, onAddRelative }: TreeNodeProps) => {
   
   return (
     <div 
-      className={`tree-node group relative ${person.isSelected ? 'border-primary ring-2 ring-primary/50' : ''}`}
+      className={`tree-node group relative w-full h-full ${person.isSelected ? 'border-primary ring-2 ring-primary/50' : ''}`}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
-      <div className="flex flex-col items-center" onClick={handleClick}>
+      <div 
+        className="flex flex-col items-center p-2 cursor-pointer bg-card border border-border rounded-xl shadow-sm hover:shadow-md transition-shadow"
+        onClick={handleClick}
+      >
         <Avatar className="w-16 h-16 mb-2">
           <AvatarImage src={person.photo || '/placeholder.svg'} alt={person.name} />
           <AvatarFallback className="bg-secondary text-secondary-foreground">
@@ -42,14 +37,17 @@ const TreeNode = ({ person, onSelect, onAddRelative }: TreeNodeProps) => {
         <div className="text-center">
           <p className="font-medium text-sm">{person.name}</p>
           {person.birthDate && (
-            <p className="text-xs text-muted-foreground">{person.birthDate}</p>
+            <p className="text-xs text-muted-foreground">{person.birthDate.split('-')[0]}</p>
+          )}
+          {person.birthPlace && (
+            <p className="text-xs text-muted-foreground truncate max-w-[70px]">{person.birthPlace}</p>
           )}
         </div>
       </div>
       
       {/* Кнопки действий */}
       {showActions && (
-        <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 flex gap-1 bg-background p-1 rounded-md shadow-md border border-border z-10">
+        <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 flex gap-1 bg-background p-1 rounded-md shadow-md border border-border z-10">
           <Button 
             variant="ghost" 
             size="icon" 
@@ -60,7 +58,8 @@ const TreeNode = ({ person, onSelect, onAddRelative }: TreeNodeProps) => {
             }}
             title="Добавить родителя"
           >
-            <Plus size={16} className="rotate-180" />
+            <User size={14} className="mb-1 mr-1" />
+            <Plus size={14} className="absolute top-1 right-1" />
           </Button>
           <Button 
             variant="ghost" 
@@ -72,7 +71,7 @@ const TreeNode = ({ person, onSelect, onAddRelative }: TreeNodeProps) => {
             }}
             title="Добавить партнера"
           >
-            <Plus size={16} className="rotate-90" />
+            <Users size={16} />
           </Button>
           <Button 
             variant="ghost" 
@@ -84,7 +83,8 @@ const TreeNode = ({ person, onSelect, onAddRelative }: TreeNodeProps) => {
             }}
             title="Добавить ребенка"
           >
-            <Plus size={16} />
+            <User size={14} className="mt-1 mr-1" />
+            <Plus size={14} className="absolute bottom-1 right-1" />
           </Button>
         </div>
       )}
