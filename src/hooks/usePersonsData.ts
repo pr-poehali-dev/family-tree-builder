@@ -1,25 +1,25 @@
 import { useState } from 'react';
 import { Person, RelationType } from '@/types/person';
 
-// Начальные данные для примера древа
+// Начальные данные для примера древа с тремя карточками
 const initialPeople: Person[] = [
   { 
     id: '1', 
-    name: 'Ангелина', 
-    surname: 'Медведева',
-    gender: 'female',
-    birthDate: '2000', 
+    name: 'Иван', 
+    surname: 'Иванов',
+    gender: 'male',
+    birthDate: '15.06.1985', 
     birthPlace: 'Москва',
     x: 200, 
-    y: 150
+    y: 150,
+    partnerId: '2'
   },
   { 
     id: '2', 
-    name: 'Никита', 
-    surname: 'Рябых',
-    middleName: 'Борисович',
-    gender: 'male',
-    birthDate: '08.05.1998', 
+    name: 'Мария', 
+    surname: 'Иванова',
+    gender: 'female',
+    birthDate: '23.10.1987', 
     birthPlace: 'Санкт-Петербург',
     x: 450, 
     y: 150,
@@ -27,24 +27,15 @@ const initialPeople: Person[] = [
   },
   { 
     id: '3', 
-    name: 'Никитич', 
-    surname: 'Рябых',
+    name: 'Кирилл', 
+    surname: 'Иванов',
     gender: 'male',
-    birthDate: '2025', 
+    birthDate: '08.03.2010', 
+    birthPlace: 'Москва',
     parentIds: ['1', '2'],
-    x: 200, 
+    x: 325, 
     y: 450 
-  },
-  { 
-    id: '4', 
-    name: 'Никитич', 
-    surname: 'Рябых',
-    gender: 'male',
-    birthDate: '01.01.2025', 
-    parentIds: ['1', '2'],
-    x: 450, 
-    y: 450 
-  },
+  }
 ];
 
 export const usePersonsData = () => {
