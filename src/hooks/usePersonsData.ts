@@ -5,25 +5,44 @@ import { Person, RelationType } from '@/types/person';
 const initialPeople: Person[] = [
   { 
     id: '1', 
-    name: 'Иван Петров', 
-    birthDate: '1980-05-15', 
+    name: 'Ангелина', 
+    surname: 'Медведева',
+    gender: 'female',
+    birthDate: '2000', 
     birthPlace: 'Москва',
-    x: 500, 
-    y: 300 
+    x: 200, 
+    y: 150
   },
   { 
     id: '2', 
-    name: 'Мария Петрова', 
-    birthDate: '1982-08-21', 
+    name: 'Никита', 
+    surname: 'Рябых',
+    middleName: 'Борисович',
+    gender: 'male',
+    birthDate: '08.05.1998', 
     birthPlace: 'Санкт-Петербург',
-    x: 700, 
-    y: 300 
+    x: 450, 
+    y: 150,
+    partnerId: '1'
   },
   { 
     id: '3', 
-    name: 'Алексей Петров', 
-    birthDate: '2010-03-10', 
-    x: 600, 
+    name: 'Никитич', 
+    surname: 'Рябых',
+    gender: 'male',
+    birthDate: '2025', 
+    parentIds: ['1', '2'],
+    x: 200, 
+    y: 450 
+  },
+  { 
+    id: '4', 
+    name: 'Никитич', 
+    surname: 'Рябых',
+    gender: 'male',
+    birthDate: '01.01.2025', 
+    parentIds: ['1', '2'],
+    x: 450, 
     y: 450 
   },
 ];
@@ -63,21 +82,57 @@ export const usePersonsData = () => {
     sourcePerson: Person, 
     relationType: RelationType
   ): { x: number, y: number } => {
+    const NODE_WIDTH = 180;
+    const NODE_HEIGHT = 160;
+    const VERTICAL_GAP = 150;
+    
     switch (relationType) {
       case 'parent':
         return { 
           x: sourcePerson.x || 0, 
-          y: (sourcePerson.y || 0) - 150 
+          y: (sourcePerson.y || 0) - NODE_HEIGHT - VERTICAL_GAP
         };
       case 'child':
+        // Если есть партнер, ребенок должен быть посередине между родителями
+        if (sourcePerson.partnerId) {
+          const partner = people.find(p => p.id === sourcePerson.partnerId);
+          if (partner && partner.x !== undefined) {
+            const isSourceLeft = (sourcePerson.x || 0) < (partner.x || 0);
+            
+            // Проверяем, сколько уже есть детей
+            const existingChildren = people.filter(p => 
+              p.parentIds?.includes(sourcePerson.id) || 
+              (partner && p.parentIds?.includes(partner.id))
+            );
+            
+            const childIndex = existingChildren.length;
+            const middleX = ((sourcePerson.x || 0) + (partner.x || 0)) / 2;
+            
+            // Распределяем детей горизонтально
+            let offsetX = 0;
+            if (childIndex === 0) {
+              offsetX = 0; // По центру для первого ребенка
+            } else if (childIndex === 1) {
+              offsetX = -NODE_WIDTH * 1.2; // Левее от центра для второго
+            } else if (childIndex >= 2) {
+              offsetX = NODE_WIDTH * 1.2; // Правее от центра для третьего
+            }
+            
+            return { 
+              x: middleX - NODE_WIDTH/2 + offsetX, 
+              y: (sourcePerson.y || 0) + NODE_HEIGHT + VERTICAL_GAP * 1.5
+            };
+          }
+        }
+        
         return { 
           x: sourcePerson.x || 0, 
-          y: (sourcePerson.y || 0) + 150 
+          y: (sourcePerson.y || 0) + NODE_HEIGHT + VERTICAL_GAP
         };
       case 'partner':
         return { 
-          x: (sourcePerson.x || 0) + 200, 
-          y: sourcePerson.y || 0 
+          x: (sourcePerson.x || 0) + NODE_WIDTH * 1.4, 
+          y: sourcePerson.y || 0
         };
     }
   };
@@ -90,9 +145,16 @@ export const usePersonsData = () => {
     const newPersonId = `new-${Date.now()}`;
     const position = calculateNodePosition(sourcePerson, relationType);
     
+    // Определяем пол по умолчанию в зависимости от типа связи
+    const defaultGender = relationType === 'partner' 
+      ? (sourcePerson.gender === 'male' ? 'female' : 'male') 
+      : 'male';
+    
     let newPerson: Person = {
       id: newPersonId,
-      name: 'Новый человек',
+      name: 'Имя',
+      surname: sourcePerson.surname || 'Фамилия',
+      gender: defaultGender,
       ...position
     };
     
@@ -101,6 +163,13 @@ export const usePersonsData = () => {
       newPerson.childrenIds = [personId];
     } else if (relationType === 'child') {
       newPerson.parentIds = [personId];
+      
+      // Если у источника есть партнер, добавляем и его в качестве родителя
+      if (sourcePerson.partnerId) {
+        newPerson.parentIds.push(sourcePerson.partnerId);
+      }
+    } else if (relationType === 'partner') {
+      newPerson.partnerId = personId;
     }
     
     // Обновляем связи существующего человека
@@ -120,6 +189,15 @@ export const usePersonsData = () => {
           return { ...person, partnerId: newPersonId };
         }
       }
+      
+      // Если добавляем партнера человеку с детьми, добавляем нового партнера также в качестве родителя этим детям
+      if (relationType === 'partner' && person.parentIds?.includes(personId)) {
+        return {
+          ...person,
+          parentIds: [...person.parentIds, newPersonId]
+        };
+      }
+      
       return person;
     });
     

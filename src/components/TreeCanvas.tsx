@@ -55,8 +55,8 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
   // Функция для отрисовки линий связей между людьми
   const renderConnectionLines = () => {
     const lines = [];
-    const NODE_WIDTH = 75;
-    const NODE_HEIGHT = 100;
+    const NODE_WIDTH = 180;
+    const NODE_HEIGHT = 160;
     
     // Создаем линии для отображения связей родитель-ребенок
     for (const person of people) {
@@ -67,51 +67,78 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
           if (parent && parent.x !== undefined && parent.y !== undefined && 
               person.x !== undefined && person.y !== undefined) {
             
-            // Расчет координат для линии (от центра верха узла-ребенка к центру низа узла-родителя)
+            // Координаты узлов
             const childX = person.x + NODE_WIDTH/2;
             const childY = person.y;
             const parentX = parent.x + NODE_WIDTH/2;
             const parentY = parent.y + NODE_HEIGHT;
             
-            lines.push(
-              <path 
-                key={`parent-${person.id}-${parentId}`}
-                d={`M${childX},${childY} C${childX},${childY-40} ${parentX},${parentY+40} ${parentX},${parentY}`}
-                stroke="var(--primary)" 
-                fill="none"
-                strokeWidth="2"
-                strokeOpacity="0.7"
-              />
-            );
-          }
-        }
-      }
-      
-      // Если у человека есть дети, но мы еще не отрисовали линии
-      if (person.childrenIds && person.childrenIds.length > 0) {
-        for (const childId of person.childrenIds) {
-          // Проверяем, не было ли уже отрисовано с другой стороны
-          const child = people.find(p => p.id === childId);
-          const alreadyDrawn = child?.parentIds?.includes(person.id);
-          
-          if (!alreadyDrawn && child && child.x !== undefined && child.y !== undefined && 
-              person.x !== undefined && person.y !== undefined) {
+            // Находим партнеров родителя, если они есть
+            const partnerId = parent.partnerId;
+            const partner = partnerId ? people.find(p => p.id === partnerId) : null;
             
-            const parentX = person.x + NODE_WIDTH/2;
-            const parentY = person.y + NODE_HEIGHT;
-            const childX = child.x + NODE_WIDTH/2;
-            const childY = child.y;
-            
-            lines.push(
-              <path 
-                key={`child-${person.id}-${childId}`}
-                d={`M${parentX},${parentY} C${parentX},${parentY+40} ${childX},${childY-40} ${childX},${childY}`}
-                stroke="var(--primary)" 
-                fill="none"
-                strokeWidth="2"
-                strokeOpacity="0.7"
-              />
-            );
+            if (partner && partner.x !== undefined && partner.y !== undefined) {
+              // Если родитель имеет партнера, рисуем соединительные линии через центральную точку
+              const partnerX = partner.x + NODE_WIDTH/2;
+              
+              // Определяем центральную точку между родителями
+              const centerX = (parentX + partnerX) / 2;
+              const centerY = parentY + 100; // Точка соединения ниже родителей
+              
+              // Рисуем соединительную линию от ребенка к центральной точке
+              lines.push(
+                <path 
+                  key={`child-to-center-${person.id}-${parent.id}`}
+                  d={`M${childX},${childY} C${childX},${childY-70} ${centerX},${centerY+70} ${centerX},${centerY}`}
+                  stroke="#C0C0C0" 
+                  fill="none"
+                  strokeWidth="2"
+                />
+              );
+              
+              // Рисуем соединительные линии от центральной точки к обоим родителям
+              lines.push(
+                <path 
+                  key={`center-to-parent1-${parent.id}`}
+                  d={`M${centerX},${centerY} C${centerX},${centerY-40} ${parentX},${parentY+40} ${parentX},${parentY}`}
+                  stroke="#C0C0C0" 
+                  fill="none"
+                  strokeWidth="2"
+                />
+              );
+              
+              lines.push(
+                <path 
+                  key={`center-to-parent2-${partner.id}`}
+                  d={`M${centerX},${centerY} C${centerX},${centerY-40} ${partnerX},${parentY+40} ${partnerX},${parentY}`}
+                  stroke="#C0C0C0" 
+                  fill="none"
+                  strokeWidth="2"
+                />
+              );
+              
+              // Добавляем маленький круг в центральной точке
+              lines.push(
+                <circle
+                  key={`center-dot-${parent.id}-${partner.id}`}
+                  cx={centerX}
+                  cy={centerY}
+                  r={4}
+                  fill="#A0A0A0"
+                />
+              );
+            } else {
+              // Если у родителя нет партнера, рисуем прямую линию
+              lines.push(
+                <path 
+                  key={`parent-${person.id}-${parentId}`}
+                  d={`M${childX},${childY} C${childX},${childY-70} ${parentX},${parentY+70} ${parentX},${parentY}`}
+                  stroke="#C0C0C0" 
+                  fill="none"
+                  strokeWidth="2"
+                />
+              );
+            }
           }
         }
       }
@@ -136,36 +163,15 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
           const rightX = rightPerson.x;
           const rightY = rightPerson.y + NODE_HEIGHT/2;
           
+          // Рисуем соединяющую линию между партнерами
           lines.push(
-            <line 
+            <path 
               key={`partner-${person.id}-${partner.id}`}
-              x1={leftX}
-              y1={leftY}
-              x2={rightX}
-              y2={rightY}
-              stroke="var(--primary)" 
+              d={`M${leftX},${leftY} C${leftX+40},${leftY} ${rightX-40},${rightY} ${rightX},${rightY}`}
+              stroke="#C0C0C0" 
+              fill="none"
               strokeWidth="2"
-              strokeOpacity="0.7"
-              strokeDasharray="4"
             />
-          );
-          
-          // Добавим сердечко посередине линии партнерства
-          const heartX = (leftX + rightX) / 2;
-          const heartY = (leftY + rightY) / 2;
-          
-          lines.push(
-            <text
-              key={`heart-${person.id}-${partner.id}`}
-              x={heartX}
-              y={heartY}
-              fontSize="12"
-              textAnchor="middle"
-              dominantBaseline="middle"
-              fill="var(--primary)"
-            >
-              ❤️
-            </text>
           );
         }
       }
@@ -177,7 +183,7 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
   return (
     <div 
       ref={canvasRef}
-      className="relative w-full h-full overflow-hidden bg-muted/20 cursor-grab"
+      className="relative w-full h-full overflow-hidden bg-slate-50 cursor-grab"
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
@@ -192,9 +198,9 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
         }}
       >
         {/* Центральное дерево */}
-        <div className="relative min-w-[1000px] min-h-[600px]">
+        <div className="relative min-w-[1200px] min-h-[800px]">
           {/* Линии связей между узлами */}
-          <svg className="absolute top-0 left-0 w-full h-full">
+          <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
             {renderConnectionLines()}
           </svg>
           
@@ -206,8 +212,6 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
                 position: 'absolute', 
                 left: person.x || 0, 
                 top: person.y || 0,
-                width: 75, // Фиксированная ширина для узла
-                height: 100, // Фиксированная высота для узла
               }}
             >
               <TreeNode 
@@ -221,23 +225,23 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
       </div>
       
       {/* Элементы управления */}
-      <div className="absolute bottom-4 right-4 bg-background rounded-md shadow-md p-2 flex gap-2 border border-border">
+      <div className="absolute bottom-4 right-4 bg-white rounded-md shadow-md p-2 flex gap-2 border border-gray-200">
         <button 
-          className="w-8 h-8 flex items-center justify-center hover:bg-muted rounded-md"
+          className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-md"
           onClick={() => setScale(prev => Math.min(prev + 0.1, 2))}
           title="Увеличить"
         >
           +
         </button>
         <button 
-          className="w-8 h-8 flex items-center justify-center hover:bg-muted rounded-md"
+          className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-md"
           onClick={() => setScale(prev => Math.max(prev - 0.1, 0.5))}
           title="Уменьшить"
         >
           -
         </button>
         <button 
-          className="w-8 h-8 flex items-center justify-center hover:bg-muted rounded-md"
+          className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-md"
           onClick={() => {
             setScale(1);
             setPosition({ x: 0, y: 0 });

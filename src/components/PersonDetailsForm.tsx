@@ -1,23 +1,10 @@
-import { useForm } from 'react-hook-form';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, Upload } from 'lucide-react';
-import { format } from 'date-fns';
-import { ru } from 'date-fns/locale';
-
-interface Person {
-  id: string;
-  name: string;
-  birthDate?: string;
-  birthPlace?: string;
-  photo?: string;
-  biography?: string;
-  documents?: string[];
-}
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Textarea } from '@/components/ui/textarea';
+import { Person } from '@/types/person';
 
 interface PersonDetailsFormProps {
   person: Person | null;
@@ -25,91 +12,114 @@ interface PersonDetailsFormProps {
 }
 
 const PersonDetailsForm = ({ person, onSave }: PersonDetailsFormProps) => {
-  const { register, handleSubmit, setValue, watch } = useForm<Partial<Person>>({
-    defaultValues: person || {}
-  });
+  const [formData, setFormData] = useState<Partial<Person>>(person || {});
   
-  const birthDate = watch('birthDate');
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+  
+  const handleGenderChange = (value: string) => {
+    setFormData(prev => ({ ...prev, gender: value as 'male' | 'female' }));
+  };
+  
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave(formData);
+  };
   
   if (!person) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">Выберите человека, чтобы увидеть и редактировать его данные</p>
-      </div>
-    );
+    return <div className="p-6 text-center text-muted-foreground">Выберите человека для просмотра или редактирования</div>;
   }
   
   return (
-    <form onSubmit={handleSubmit(onSave)} className="space-y-4 p-4">
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="font-heading text-xl">Информация о человеке</h3>
-        <Button type="submit">Сохранить</Button>
+    <form onSubmit={handleSubmit} className="space-y-4 p-4">
+      <div className="space-y-2">
+        <Label htmlFor="surname">Фамилия</Label>
+        <Input 
+          id="surname" 
+          name="surname"
+          value={formData.surname || ''} 
+          onChange={handleChange}
+          placeholder="Фамилия"
+        />
       </div>
       
       <div className="space-y-2">
         <Label htmlFor="name">Имя</Label>
-        <Input id="name" {...register('name')} />
+        <Input 
+          id="name" 
+          name="name"
+          value={formData.name || ''} 
+          onChange={handleChange}
+          placeholder="Имя"
+        />
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="middleName">Отчество</Label>
+        <Input 
+          id="middleName" 
+          name="middleName"
+          value={formData.middleName || ''} 
+          onChange={handleChange}
+          placeholder="Отчество"
+        />
+      </div>
+      
+      <div className="space-y-2">
+        <Label>Пол</Label>
+        <RadioGroup 
+          value={formData.gender || 'male'} 
+          onValueChange={handleGenderChange}
+          className="flex space-x-4"
+        >
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="male" id="male" />
+            <Label htmlFor="male">Мужской</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="female" id="female" />
+            <Label htmlFor="female">Женский</Label>
+          </div>
+        </RadioGroup>
       </div>
       
       <div className="space-y-2">
         <Label htmlFor="birthDate">Дата рождения</Label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className="w-full justify-start text-left font-normal"
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {birthDate ? format(new Date(birthDate), 'PPP', { locale: ru }) : <span>Выберите дату</span>}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0">
-            <Calendar
-              mode="single"
-              selected={birthDate ? new Date(birthDate) : undefined}
-              onSelect={(date) => setValue('birthDate', date ? format(date, 'yyyy-MM-dd') : undefined)}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
+        <Input 
+          id="birthDate" 
+          name="birthDate"
+          value={formData.birthDate || ''} 
+          onChange={handleChange}
+          placeholder="Например: 01.01.2000"
+        />
       </div>
       
       <div className="space-y-2">
         <Label htmlFor="birthPlace">Место рождения</Label>
-        <Input id="birthPlace" {...register('birthPlace')} />
+        <Input 
+          id="birthPlace" 
+          name="birthPlace"
+          value={formData.birthPlace || ''} 
+          onChange={handleChange}
+          placeholder="Город, страна"
+        />
       </div>
       
       <div className="space-y-2">
         <Label htmlFor="biography">Биография</Label>
-        <Textarea id="biography" rows={5} {...register('biography')} />
+        <Textarea 
+          id="biography" 
+          name="biography"
+          value={formData.biography || ''} 
+          onChange={handleChange}
+          placeholder="Краткая биография"
+          rows={4}
+        />
       </div>
       
-      <div className="space-y-2">
-        <Label>Фотография</Label>
-        <div className="flex items-center gap-4">
-          <div className="w-24 h-24 bg-muted rounded-md overflow-hidden">
-            {person.photo ? (
-              <img src={person.photo} alt={person.name} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                Нет фото
-              </div>
-            )}
-          </div>
-          <Button type="button" variant="outline" className="flex gap-2">
-            <Upload size={16} />
-            Загрузить фото
-          </Button>
-        </div>
-      </div>
-      
-      <div className="space-y-2">
-        <Label>Документы</Label>
-        <Button type="button" variant="outline" className="w-full flex gap-2 justify-center">
-          <Upload size={16} />
-          Добавить документы
-        </Button>
-      </div>
+      <Button type="submit" className="w-full">Сохранить</Button>
     </form>
   );
 };
