@@ -1,40 +1,57 @@
 import { useState } from 'react';
 import { Person, RelationType } from '@/types/person';
 
-// Начальные данные для примера древа с тремя карточками
+// Начальные данные для примера древа с основным пользователем и пустыми узлами
 const initialPeople: Person[] = [
   { 
     id: '1', 
+    name: 'Отец', 
+    surname: '',
+    gender: 'male',
+    x: 150, 
+    y: 100,
+    isPlaceholder: true
+  },
+  { 
+    id: '2', 
+    name: 'Мать', 
+    surname: '',
+    gender: 'female',
+    x: 400, 
+    y: 100,
+    isPlaceholder: true
+  },
+  { 
+    id: '3', 
     name: 'Иван', 
     surname: 'Иванов',
     gender: 'male',
     birthDate: '15.06.1985', 
     birthPlace: 'Москва',
-    x: 200, 
-    y: 150,
-    partnerId: '2'
-  },
-  { 
-    id: '2', 
-    name: 'Мария', 
-    surname: 'Иванова',
-    gender: 'female',
-    birthDate: '23.10.1987', 
-    birthPlace: 'Санкт-Петербург',
-    x: 450, 
-    y: 150,
-    partnerId: '1'
-  },
-  { 
-    id: '3', 
-    name: 'Кирилл', 
-    surname: 'Иванов',
-    gender: 'male',
-    birthDate: '08.03.2010', 
-    birthPlace: 'Москва',
     parentIds: ['1', '2'],
-    x: 325, 
-    y: 450 
+    x: 275, 
+    y: 300,
+    isMainPerson: true
+  },
+  { 
+    id: '4', 
+    name: 'Жена', 
+    surname: '',
+    gender: 'female',
+    x: 500, 
+    y: 300,
+    partnerId: '3',
+    isPlaceholder: true
+  },
+  { 
+    id: '5', 
+    name: 'Ребенок', 
+    surname: '',
+    gender: 'male',
+    parentIds: ['3', '4'],
+    x: 275, 
+    y: 500,
+    isPlaceholder: true
   }
 ];
 
@@ -61,11 +78,11 @@ export const usePersonsData = () => {
     if (!selectedPerson) return;
     
     const updatedPeople = people.map(person => 
-      person.id === selectedPerson.id ? { ...person, ...data } : person
+      person.id === selectedPerson.id ? { ...person, ...data, isPlaceholder: false } : person
     );
     
     setPeople(updatedPeople);
-    setSelectedPerson(prev => prev ? { ...prev, ...data } : null);
+    setSelectedPerson(prev => prev ? { ...prev, ...data, isPlaceholder: false } : null);
   };
   
   // Вычисление позиции для нового узла в зависимости от типа связи
@@ -143,9 +160,12 @@ export const usePersonsData = () => {
     
     let newPerson: Person = {
       id: newPersonId,
-      name: 'Имя',
-      surname: sourcePerson.surname || 'Фамилия',
+      name: relationType === 'partner' ? 'Партнер' : 
+            relationType === 'parent' ? (defaultGender === 'male' ? 'Отец' : 'Мать') : 
+            'Ребенок',
+      surname: sourcePerson.surname || '',
       gender: defaultGender,
+      isPlaceholder: true,
       ...position
     };
     

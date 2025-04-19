@@ -15,6 +15,8 @@ export interface Person {
   x?: number;
   y?: number;
   isSelected?: boolean;
+  isPlaceholder?: boolean;
+  isMainPerson?: boolean;
 }
 
 export type RelationType = 'parent' | 'child' | 'partner';
