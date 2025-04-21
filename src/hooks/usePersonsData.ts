@@ -5,53 +5,33 @@ import { Person, RelationType } from '@/types/person';
 const initialPeople: Person[] = [
   { 
     id: '1', 
-    name: 'Отец', 
+    name: 'Мать', 
     surname: '',
-    gender: 'male',
-    x: 150, 
+    gender: 'female',
+    x: 250, 
     y: 100,
     isPlaceholder: true
   },
   { 
     id: '2', 
-    name: 'Мать', 
+    name: 'Отец', 
     surname: '',
-    gender: 'female',
-    x: 400, 
+    gender: 'male',
+    x: 450, 
     y: 100,
     isPlaceholder: true
   },
   { 
     id: '3', 
-    name: 'Иван', 
-    surname: 'Иванов',
+    name: 'Иванов', 
+    surname: 'Иван',
     gender: 'male',
     birthDate: '15.06.1985', 
     birthPlace: 'Москва',
     parentIds: ['1', '2'],
-    x: 275, 
+    x: 350, 
     y: 300,
     isMainPerson: true
-  },
-  { 
-    id: '4', 
-    name: 'Жена', 
-    surname: '',
-    gender: 'female',
-    x: 500, 
-    y: 300,
-    partnerId: '3',
-    isPlaceholder: true
-  },
-  { 
-    id: '5', 
-    name: 'Ребенок', 
-    surname: '',
-    gender: 'male',
-    parentIds: ['3', '4'],
-    x: 275, 
-    y: 500,
-    isPlaceholder: true
   }
 ];
 
@@ -90,7 +70,7 @@ export const usePersonsData = () => {
     sourcePerson: Person, 
     relationType: RelationType
   ): { x: number, y: number } => {
-    const NODE_WIDTH = 180;
+    const NODE_WIDTH = 130;
     const NODE_HEIGHT = 160;
     const VERTICAL_GAP = 150;
     
@@ -163,7 +143,7 @@ export const usePersonsData = () => {
       name: relationType === 'partner' ? 'Партнер' : 
             relationType === 'parent' ? (defaultGender === 'male' ? 'Отец' : 'Мать') : 
             'Ребенок',
-      surname: sourcePerson.surname || '',
+      surname: '',
       gender: defaultGender,
       isPlaceholder: true,
       ...position

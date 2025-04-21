@@ -56,153 +56,47 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
   const renderConnectionLines = () => {
     const lines = [];
     
-    // Создаем линии для отображения связей
-    for (const person of people) {
-      // Если узел является главным (по центру), то рисуем другие линии
-      const isMainPerson = person.isMainPerson;
+    // Найдем главного человека
+    const mainPerson = people.find(p => p.isMainPerson);
+    if (!mainPerson || mainPerson.x === undefined || mainPerson.y === undefined) return null;
+    
+    // Найдем родителей
+    const parents = people.filter(p => p.isPlaceholder && (p.gender === 'male' || p.gender === 'female'));
+    
+    // Если есть оба родителя, рисуем горизонтальную линию между ними
+    if (parents.length >= 2 && parents[0].x !== undefined && parents[1].x !== undefined && 
+        parents[0].y !== undefined && parents[1].y !== undefined) {
       
-      // Если у человека есть родители, рисуем линии к родителям
-      if (person.parentIds && person.parentIds.length > 0) {
-        for (const parentId of person.parentIds) {
-          const parent = people.find(p => p.id === parentId);
-          if (parent && parent.x !== undefined && parent.y !== undefined && 
-              person.x !== undefined && person.y !== undefined) {
-            
-            // Координаты узлов для расчета линий зависят от типа узла
-            const getCoordinates = (node: Person) => {
-              if (node.isPlaceholder) {
-                return {
-                  x: node.x + 60, // Центр круглого плейсхолдера
-                  y: node.isPlaceholder ? node.y + 60 : node.y,
-                  bottom: node.isPlaceholder ? node.y + 120 : node.y + 150,
-                  width: 120,
-                  height: 120
-                };
-              } else if (node.isMainPerson) {
-                return {
-                  x: node.x + 70, // Центр главного узла
-                  y: node.y,
-                  bottom: node.y + 140,
-                  width: 140,
-                  height: 140
-                };
-              } else {
-                return {
-                  x: node.x + 90, // Центр обычного узла
-                  y: node.y,
-                  bottom: node.y + 180,
-                  width: 180,
-                  height: 180
-                };
-              }
-            };
-            
-            const childCoords = getCoordinates(person);
-            const parentCoords = getCoordinates(parent);
-            
-            // Рисуем вертикальную линию
-            lines.push(
-              <path 
-                key={`parent-${person.id}-${parentId}`}
-                d={`M${childCoords.x},${childCoords.y} L${childCoords.x},${
-                  (childCoords.y + parentCoords.bottom) / 2
-                } L${parentCoords.x},${
-                  (childCoords.y + parentCoords.bottom) / 2
-                } L${parentCoords.x},${parentCoords.bottom}`}
-                stroke="#CCCCCC" 
-                fill="none"
-                strokeWidth="1.5"
-              />
-            );
-            
-            // Если это линия к основному родителю и если есть два родителя, рисуем горизонтальную линию между ними
-            if (parent.partnerId) {
-              const partner = people.find(p => p.id === parent.partnerId);
-              if (partner && partner.x !== undefined && partner.y !== undefined) {
-                // Проверяем, не была ли уже отрисована линия партнерства
-                const alreadyDrawn = people.findIndex(p => p.id === partner.id) < people.findIndex(p => p.id === parent.id);
-                
-                if (!alreadyDrawn) {
-                  const partnerCoords = getCoordinates(partner);
-                  
-                  // Рисуем горизонтальную линию между родителями
-                  lines.push(
-                    <path 
-                      key={`partner-${parent.id}-${partner.id}`}
-                      d={`M${parentCoords.x},${parentCoords.y + parentCoords.height/2} L${partnerCoords.x},${partnerCoords.y + partnerCoords.height/2}`}
-                      stroke="#CCCCCC" 
-                      fill="none"
-                      strokeWidth="1.5"
-                    />
-                  );
-                }
-              }
-            }
-          }
-        }
-      }
+      const mother = parents.find(p => p.gender === 'female');
+      const father = parents.find(p => p.gender === 'male');
       
-      // Если у человека есть партнер, рисуем горизонтальную линию
-      if (person.partnerId && person.isMainPerson) {
-        const partner = people.find(p => p.id === person.partnerId);
+      if (mother && father) {
+        // Горизонтальная линия между родителями
+        lines.push(
+          <line 
+            key="parent-connection"
+            x1={mother.x + 45}
+            y1={mother.y + 45}
+            x2={father.x + 45}
+            y2={father.y + 45}
+            stroke={mother.gender === 'female' ? "#FDA4AF" : "#93C5FD"}
+            strokeWidth="1"
+          />
+        );
         
-        if (partner && partner.x !== undefined && partner.y !== undefined && 
-            person.x !== undefined && person.y !== undefined) {
-          
-          // Получаем координаты для главного узла и партнера
-          const personCoords = {
-            x: person.x + 140, // Правый край главного узла
-            y: person.y + 70  // Центр по вертикали
-          };
-          
-          const partnerCoords = {
-            x: partner.x,       // Левый край узла партнера
-            y: partner.y + 60   // Центр по вертикали для плейсхолдера
-          };
-          
-          // Рисуем горизонтальную линию между главным узлом и партнером
-          lines.push(
-            <path 
-              key={`partner-${person.id}-${partner.id}`}
-              d={`M${personCoords.x},${personCoords.y} L${partnerCoords.x},${partnerCoords.y}`}
-              stroke="#CCCCCC" 
-              fill="none"
-              strokeWidth="1.5"
-            />
-          );
-        }
-      }
-      
-      // Если узел главный, рисуем линию к ребенку
-      if (person.isMainPerson) {
-        const children = people.filter(p => p.parentIds?.includes(person.id));
-        
-        if (children.length > 0 && person.x !== undefined && person.y !== undefined) {
-          const child = children[0]; // берем первого ребенка
-          
-          if (child && child.x !== undefined && child.y !== undefined) {
-            // Координаты для главного узла и ребенка
-            const personBottom = person.y + 140; // Нижний край главного узла
-            const childY = child.y;
-            const personCenterX = person.x + 70; // Центр главного узла по горизонтали
-            const childCenterX = child.x + 60; // Центр узла ребенка по горизонтали (для плейсхолдера)
-            
-            // Рисуем вертикальную линию от главного узла к ребенку
-            lines.push(
-              <path 
-                key={`child-${person.id}-${child.id}`}
-                d={`M${personCenterX},${personBottom} L${personCenterX},${
-                  (personBottom + childY) / 2
-                } L${childCenterX},${
-                  (personBottom + childY) / 2
-                } L${childCenterX},${childY}`}
-                stroke="#CCCCCC" 
-                fill="none"
-                strokeWidth="1.5"
-              />
-            );
-          }
-        }
+        // Вертикальная линия вниз от центра родительской линии
+        const centerX = (mother.x + father.x) / 2 + 45;
+        lines.push(
+          <line 
+            key="parent-to-main"
+            x1={centerX}
+            y1={mother.y + 45}
+            x2={mainPerson.x + 65}
+            y2={mainPerson.y}
+            stroke="#FDA4AF"
+            strokeWidth="1"
+          />
+        );
       }
     }
     
@@ -212,7 +106,7 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
   return (
     <div 
       ref={canvasRef}
-      className="relative w-full h-full overflow-hidden bg-gray-50 cursor-grab"
+      className="relative w-full h-full overflow-hidden bg-[#f3f6f0] cursor-grab"
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}

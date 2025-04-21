@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Pencil, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { Person, RelationType } from '@/types/person';
 
 interface TreeNodeProps {
@@ -18,19 +18,19 @@ const TreeNode = ({ person, onSelect, onAddRelative }: TreeNodeProps) => {
   
   if (isPlaceholder) {
     // Стиль для пустых узлов (плейсхолдеры)
-    nodeStyles = 'bg-gray-100 rounded-full w-[120px] h-[120px] flex flex-col items-center justify-center p-2 shadow-sm';
+    nodeStyles = 'bg-white rounded-lg w-[90px] h-[90px] flex flex-col items-center justify-center shadow-sm border border-dashed border-gray-300';
   } else if (isMainPerson) {
     // Стиль для главного узла (синий с фотографией)
-    nodeStyles = 'bg-blue-100 border-4 border-blue-400 rounded-full w-[140px] h-[140px] flex flex-col items-center justify-center p-2 shadow-md';
+    nodeStyles = 'bg-blue-50 border-[1px] border-blue-300 rounded-lg w-[130px] h-[160px] flex flex-col items-center pt-10 shadow-sm';
   } else {
     // Стиль для обычных заполненных узлов
     const cardColor = person.gender === 'female' 
-      ? 'bg-gradient-to-r from-pink-100 to-pink-50 border-pink-300' 
+      ? 'bg-pink-50 border-pink-200' 
       : person.gender === 'male' 
-        ? 'bg-gradient-to-r from-blue-50 to-blue-100 border-blue-300' 
-        : 'bg-gradient-to-r from-amber-50 to-amber-100 border-amber-300';
+        ? 'bg-blue-50 border-blue-200' 
+        : 'bg-amber-50 border-amber-200';
     
-    nodeStyles = `rounded-xl ${cardColor} border-2 p-3 shadow-sm transition-shadow hover:shadow-md`;
+    nodeStyles = `rounded-lg ${cardColor} border-[1px] p-3 shadow-sm`;
   }
   
   return (
@@ -42,90 +42,44 @@ const TreeNode = ({ person, onSelect, onAddRelative }: TreeNodeProps) => {
         {isPlaceholder ? (
           <>
             {/* Содержимое для пустого узла */}
-            <Plus size={24} className="text-gray-400 mb-1" />
-            <p className="text-sm text-gray-500 text-center">{person.name}</p>
+            <div className={`flex items-center justify-center rounded-full h-6 w-6 mb-2 ${person.gender === 'female' ? 'bg-pink-200 text-pink-500' : 'bg-blue-200 text-blue-500'}`}>
+              <Plus size={16} />
+            </div>
+            <p className="text-sm text-center">{person.name}</p>
           </>
         ) : isMainPerson ? (
           <>
             {/* Содержимое для главного узла */}
-            <div className="relative w-full h-full flex flex-col items-center">
-              <Avatar className="h-16 w-16 mb-2 border-2 border-white bg-blue-200">
-                <AvatarImage src={person.photo || '/placeholder.svg'} alt={person.name} />
-                <AvatarFallback className="bg-blue-200 text-blue-700">
+            <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-[60px] h-[60px] bg-blue-50 border-[1px] border-blue-300 rounded-lg flex items-center justify-center">
+              <Avatar className="h-12 w-12">
+                <AvatarImage src={person.photo || '/placeholder.svg'} alt="Вы" />
+                <AvatarFallback className="bg-blue-100 text-blue-700">
                   {person.name[0]}{person.surname?.[0] || ''}
                 </AvatarFallback>
               </Avatar>
-              
-              <div className="tag absolute -bottom-3 bg-blue-500 px-3 py-1 rounded-full text-white text-xs flex items-center">
-                <span className="mr-1">👑 Это я</span>
-              </div>
             </div>
             
-            <div className="absolute -bottom-8 text-center w-full">
-              <p className="font-medium">{person.surname} {person.name}</p>
-            </div>
+            <p className="text-blue-700 text-center">Вы</p>
           </>
         ) : (
           <>
             {/* Содержимое для обычного узла */}
-            {person.gender && (
-              <div className={`absolute top-3 left-3 rounded-md ${person.gender === 'female' ? 'bg-pink-400' : 'bg-blue-400'} px-2 py-0.5 text-xs font-medium text-white`}>
-                {person.gender === 'female' ? 'жен' : 'муж'}
-              </div>
-            )}
-            
-            <button 
-              className="absolute top-3 right-3 rounded-md bg-gray-100 p-1 text-gray-500 hover:bg-gray-200"
-              onClick={(e) => {
-                e.stopPropagation();
-                onSelect(person);
-              }}
-            >
-              <Pencil size={14} />
-            </button>
-            
-            <div className="mt-6 flex flex-col items-center">
-              <Avatar className="h-16 w-16 mb-3 bg-gray-200">
+            <div className="flex flex-col items-center">
+              <Avatar className="h-16 w-16 mb-2">
                 <AvatarImage src={person.photo || '/placeholder.svg'} alt={person.name} />
-                <AvatarFallback className="bg-gray-200 text-gray-500">
+                <AvatarFallback className="bg-gray-100">
                   {person.name[0]}{person.surname?.[0] || ''}
                 </AvatarFallback>
               </Avatar>
               
               <div className="text-center">
-                <p className="font-medium text-gray-800">{person.surname}</p>
-                <p className="text-sm text-gray-700">{person.name}</p>
-                {person.middleName && (
-                  <p className="text-sm text-gray-700">{person.middleName}</p>
+                <p className="font-medium">{person.name}</p>
+                {person.birthDate && (
+                  <p className="text-sm text-gray-500">{person.birthDate}</p>
                 )}
-                
-                <p className="mt-2 text-sm text-gray-600">
-                  {person.birthDate 
-                    ? (person.birthDate.includes('.') 
-                      ? person.birthDate 
-                      : person.birthDate.includes('-') 
-                        ? person.birthDate.split('-')[0] 
-                        : person.birthDate)
-                    : ''}
-                </p>
               </div>
             </div>
           </>
-        )}
-        
-        {/* Кнопка добавления показывается только для заполненных узлов */}
-        {!isPlaceholder && (
-          <button
-            className={`absolute -bottom-4 left-1/2 -translate-x-1/2 flex h-8 w-8 items-center justify-center rounded-full ${
-              isMainPerson ? 'bg-blue-500' : person.gender === 'female' ? 'bg-pink-400' : 'bg-blue-400'
-            } text-white shadow-md hover:opacity-90`}
-            onClick={(e) => {
-              e.stopPropagation();
-              onAddRelative(person.id, 'child');
-            }}
-          >
-            <Plus size={18} />
-          </button>
         )}
       </div>
     </div>
