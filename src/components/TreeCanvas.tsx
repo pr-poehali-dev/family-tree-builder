@@ -60,6 +60,10 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
     const mainPerson = people.find(p => p.isMainPerson);
     if (!mainPerson || mainPerson.x === undefined || mainPerson.y === undefined) return null;
     
+    // Координаты для главного человека (центр верхнего блока с аватаром)
+    const mainPersonX = mainPerson.x + 60;
+    const mainPersonTopY = mainPerson.y + 8; // Верхняя точка (центр аватара)
+    
     // Найдем родителей
     const parents = people.filter(p => p.isPlaceholder && (p.gender === 'male' || p.gender === 'female'));
     
@@ -71,28 +75,34 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
       const father = parents.find(p => p.gender === 'male');
       
       if (mother && father) {
-        // Горизонтальная линия между родителями
+        // Центральные точки для каждого родителя
+        const motherX = mother.x + 48;
+        const motherY = mother.y + 48;
+        const fatherX = father.x + 48;
+        const fatherY = father.y + 48;
+        
+        // Горизонтальная линия между родителями (нежно-розовая)
         lines.push(
           <line 
             key="parent-connection"
-            x1={mother.x + 45}
-            y1={mother.y + 45}
-            x2={father.x + 45}
-            y2={father.y + 45}
-            stroke={mother.gender === 'female' ? "#FDA4AF" : "#93C5FD"}
+            x1={motherX}
+            y1={motherY}
+            x2={fatherX}
+            y2={fatherY}
+            stroke="#FDA4AF"
             strokeWidth="1"
           />
         );
         
-        // Вертикальная линия вниз от центра родительской линии
-        const centerX = (mother.x + father.x) / 2 + 45;
+        // Вертикальная линия вниз от центра родительской линии к главному человеку (нежно-розовая)
+        const centerX = (motherX + fatherX) / 2;
         lines.push(
           <line 
             key="parent-to-main"
             x1={centerX}
-            y1={mother.y + 45}
-            x2={mainPerson.x + 65}
-            y2={mainPerson.y}
+            y1={motherY}
+            x2={mainPersonX}
+            y2={mainPersonTopY}
             stroke="#FDA4AF"
             strokeWidth="1"
           />

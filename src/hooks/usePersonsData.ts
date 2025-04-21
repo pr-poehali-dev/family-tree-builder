@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Person, RelationType } from '@/types/person';
-import { calculateNodePosition } from '@/utils/personUtils';
 import { usePersonSelection } from '@/hooks/usePersonSelection';
 import { usePersonModification } from '@/hooks/usePersonModification';
 import { useRelativeAddition } from '@/hooks/useRelativeAddition';
@@ -12,7 +11,7 @@ const initialPeople: Person[] = [
     name: 'Мать', 
     surname: '',
     gender: 'female',
-    x: 250, 
+    x: 180, 
     y: 100,
     isPlaceholder: true
   },
@@ -33,7 +32,7 @@ const initialPeople: Person[] = [
     birthDate: '15.06.1985', 
     birthPlace: 'Москва',
     parentIds: ['1', '2'],
-    x: 350, 
+    x: 320, 
     y: 300,
     isMainPerson: true
   }
