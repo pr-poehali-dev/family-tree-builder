@@ -17,6 +17,7 @@ export interface Person {
   isSelected?: boolean;
   isPlaceholder?: boolean;
   isMainPerson?: boolean;
+  initials?: string; // Добавлено для отображения инициалов
 }
 
 export type RelationType = 'parent' | 'child' | 'partner';

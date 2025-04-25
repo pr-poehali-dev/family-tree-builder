@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import TreeNode from '@/components/TreeNode';
 import { Person, RelationType } from '@/types/person';
+import { ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 
 interface TreeCanvasProps {
   people: Person[];
@@ -52,63 +53,90 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
     }
   }, []);
   
+  // Функция для поиска родителей персоны по ID
+  const findParents = (personId: string) => {
+    return people.filter(p => p.childrenIds?.includes(personId));
+  };
+  
   // Функция для отрисовки линий связей между людьми
   const renderConnectionLines = () => {
-    const lines = [];
+    const lines: JSX.Element[] = [];
+    const processedConnections = new Set<string>();
     
-    // Найдем главного человека
-    const mainPerson = people.find(p => p.isMainPerson);
-    if (!mainPerson || mainPerson.x === undefined || mainPerson.y === undefined) return null;
-    
-    // Координаты для главного человека (центр верхнего блока с аватаром)
-    const mainPersonX = mainPerson.x + 60;
-    const mainPersonTopY = mainPerson.y + 8; // Верхняя точка (центр аватара)
-    
-    // Найдем родителей
-    const parents = people.filter(p => p.isPlaceholder && (p.gender === 'male' || p.gender === 'female'));
-    
-    // Если есть оба родителя, рисуем горизонтальную линию между ними
-    if (parents.length >= 2 && parents[0].x !== undefined && parents[1].x !== undefined && 
-        parents[0].y !== undefined && parents[1].y !== undefined) {
-      
-      const mother = parents.find(p => p.gender === 'female');
-      const father = parents.find(p => p.gender === 'male');
-      
-      if (mother && father) {
-        // Центральные точки для каждого родителя
-        const motherX = mother.x + 48;
-        const motherY = mother.y + 48;
-        const fatherX = father.x + 48;
-        const fatherY = father.y + 48;
-        
-        // Горизонтальная линия между родителями (нежно-розовая)
-        lines.push(
-          <line 
-            key="parent-connection"
-            x1={motherX}
-            y1={motherY}
-            x2={fatherX}
-            y2={fatherY}
-            stroke="#FDA4AF"
-            strokeWidth="1"
-          />
-        );
-        
-        // Вертикальная линия вниз от центра родительской линии к главному человеку (нежно-розовая)
-        const centerX = (motherX + fatherX) / 2;
-        lines.push(
-          <line 
-            key="parent-to-main"
-            x1={centerX}
-            y1={motherY}
-            x2={mainPersonX}
-            y2={mainPersonTopY}
-            stroke="#FDA4AF"
-            strokeWidth="1"
-          />
-        );
+    people.forEach(person => {
+      if (person.childrenIds) {
+        // Для каждого ребенка этого человека
+        person.childrenIds.forEach(childId => {
+          const child = people.find(p => p.id === childId);
+          if (child && child.x !== undefined && child.y !== undefined && 
+              person.x !== undefined && person.y !== undefined) {
+            
+            // Создаем уникальный ключ для соединения
+            const connectionKey = [person.id, childId].sort().join('-');
+            
+            if (!processedConnections.has(connectionKey)) {
+              processedConnections.add(connectionKey);
+              
+              // Находим всех родителей ребенка
+              const parents = findParents(childId);
+              
+              if (parents.length === 2) {
+                // Если два родителя, рисуем горизонтальную линию между ними
+                const parent1 = parents[0];
+                const parent2 = parents[1];
+                
+                if (parent1.x !== undefined && parent1.y !== undefined && 
+                    parent2.x !== undefined && parent2.y !== undefined) {
+                  
+                  // Определяем порядок родителей (слева направо)
+                  const [leftParent, rightParent] = parent1.x < parent2.x ? [parent1, parent2] : [parent2, parent1];
+                  
+                  // Горизонтальная линия между родителями
+                  lines.push(
+                    <line 
+                      key={`h-${leftParent.id}-${rightParent.id}`}
+                      x1={leftParent.x + 8}
+                      y1={leftParent.y + 16}
+                      x2={rightParent.x + 8}
+                      y2={rightParent.y + 16}
+                      stroke="#999999"
+                      strokeWidth="1"
+                    />
+                  );
+                  
+                  // Центральная вертикальная линия вниз
+                  const centerX = (leftParent.x + rightParent.x) / 2 + 8;
+                  lines.push(
+                    <line 
+                      key={`v-${leftParent.id}-${rightParent.id}-${child.id}`}
+                      x1={centerX}
+                      y1={leftParent.y + 16}
+                      x2={child.x + 8}
+                      y2={child.y - 10}
+                      stroke="#999999"
+                      strokeWidth="1"
+                    />
+                  );
+                }
+              } else if (parents.length === 1) {
+                // Если один родитель, рисуем прямую вертикальную линию
+                lines.push(
+                  <line 
+                    key={`v-${person.id}-${childId}`}
+                    x1={person.x + 8}
+                    y1={person.y + 16}
+                    x2={child.x + 8}
+                    y2={child.y - 10}
+                    stroke="#999999"
+                    strokeWidth="1"
+                  />
+                );
+              }
+            }
+          }
+        });
       }
-    }
+    });
     
     return lines;
   };
@@ -116,7 +144,7 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
   return (
     <div 
       ref={canvasRef}
-      className="relative w-full h-full overflow-hidden bg-[#f3f6f0] cursor-grab"
+      className="relative w-full h-full overflow-hidden bg-[#f9f9f9] cursor-grab"
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
@@ -130,7 +158,7 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
           transition: isDragging ? 'none' : 'transform 0.1s ease',
         }}
       >
-        {/* Центральное дерево */}
+        {/* Канва с семейным древом */}
         <div className="relative min-w-[1200px] min-h-[800px]">
           {/* Линии связей между узлами */}
           <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
@@ -150,7 +178,6 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
               <TreeNode 
                 person={person} 
                 onSelect={onSelectPerson}
-                onAddRelative={onAddRelative}
               />
             </div>
           ))}
@@ -158,20 +185,20 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
       </div>
       
       {/* Элементы управления */}
-      <div className="absolute bottom-4 right-4 bg-white rounded-md shadow-md p-2 flex gap-2 border border-gray-200">
+      <div className="absolute bottom-4 right-4 bg-white rounded-md shadow-lg p-2 flex gap-2 border border-gray-200">
         <button 
           className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-md"
           onClick={() => setScale(prev => Math.min(prev + 0.1, 2))}
           title="Увеличить"
         >
-          +
+          <ZoomIn size={18} />
         </button>
         <button 
           className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-md"
           onClick={() => setScale(prev => Math.max(prev - 0.1, 0.5))}
           title="Уменьшить"
         >
-          -
+          <ZoomOut size={18} />
         </button>
         <button 
           className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-md"
@@ -181,7 +208,7 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
           }}
           title="Сбросить масштаб"
         >
-          ⟳
+          <RotateCcw size={18} />
         </button>
       </div>
     </div>
