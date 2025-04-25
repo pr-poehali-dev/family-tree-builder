@@ -36,75 +36,108 @@ const Hero = () => {
               <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-secondary/10 rounded-lg"></div>
               <div className="relative w-full h-full flex items-center justify-center">
                 <div className="family-tree-visual w-[90%] h-[90%] relative">
-                  <div className="interactive-node absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
-                                w-20 h-20 bg-background border-2 border-primary rounded-full
-                                flex items-center justify-center cursor-pointer
-                                hover:scale-110 transition-transform duration-300
-                                shadow-lg z-30">
-                    <span className="font-medium text-center">Вы</span>
+                  {/* Основная персона (Вы) */}
+                  <div className="absolute left-1/2 bottom-[10%] transform -translate-x-1/2">
+                    <div className="flex flex-col items-center">
+                      <div className="relative w-20 h-20 bg-[#FDA4AF] rounded-md overflow-hidden">
+                        <div className="absolute top-0 right-0 w-5 h-5 bg-white transform rotate-45 translate-x-2.5 -translate-y-2.5"></div>
+                        <div className="w-full h-full flex items-center justify-center text-white font-semibold text-xl">
+                          Л
+                        </div>
+                      </div>
+                      <div className="mt-2 text-center text-sm font-medium">Вы</div>
+                    </div>
                   </div>
                   
                   {/* Родители */}
-                  <div className="interactive-node absolute top-[15%] left-[35%] transform -translate-x-1/2 -translate-y-1/2
-                                w-16 h-16 bg-background border-2 border-primary/80 rounded-full
-                                flex items-center justify-center cursor-pointer
-                                hover:scale-110 transition-transform duration-300
-                                shadow-md z-20">
-                    <span className="font-medium text-sm">Мама</span>
+                  <div className="absolute left-[35%] bottom-[40%] transform -translate-x-1/2">
+                    <div className="flex flex-col items-center">
+                      <div className="relative w-16 h-16 bg-[#FDA4AF] rounded-md overflow-hidden">
+                        <div className="absolute top-0 right-0 w-4 h-4 bg-white transform rotate-45 translate-x-2 -translate-y-2"></div>
+                        <div className="w-full h-full flex items-center justify-center text-white font-semibold text-lg">
+                          МЛ
+                        </div>
+                      </div>
+                      <div className="mt-2 text-center text-xs font-medium">Мама</div>
+                    </div>
                   </div>
                   
-                  <div className="interactive-node absolute top-[15%] left-[65%] transform -translate-x-1/2 -translate-y-1/2
-                                w-16 h-16 bg-background border-2 border-primary/80 rounded-full
-                                flex items-center justify-center cursor-pointer
-                                hover:scale-110 transition-transform duration-300
-                                shadow-md z-20">
-                    <span className="font-medium text-sm">Папа</span>
+                  <div className="absolute left-[65%] bottom-[40%] transform -translate-x-1/2">
+                    <div className="flex flex-col items-center">
+                      <div className="relative w-16 h-16 bg-[#7DD3FC] rounded-md overflow-hidden">
+                        <div className="absolute top-0 right-0 w-4 h-4 bg-white transform rotate-45 translate-x-2 -translate-y-2"></div>
+                        <div className="w-full h-full flex items-center justify-center text-white font-semibold text-lg">
+                          ИЛ
+                        </div>
+                      </div>
+                      <div className="mt-2 text-center text-xs font-medium">Папа</div>
+                    </div>
                   </div>
                   
-                  {/* Прародители */}
-                  <div className="interactive-node absolute top-[5%] left-[25%] transform -translate-x-1/2 -translate-y-1/2
-                                w-12 h-12 bg-background border border-primary/60 rounded-full
-                                flex items-center justify-center cursor-pointer
-                                hover:scale-110 transition-transform duration-300
-                                shadow-sm z-10">
-                    <span className="font-medium text-xs">Бабушка</span>
+                  {/* Бабушки и дедушки */}
+                  <div className="absolute left-[25%] bottom-[70%] transform -translate-x-1/2">
+                    <div className="flex flex-col items-center">
+                      <div className="relative w-12 h-12 bg-[#FDA4AF] rounded-md overflow-hidden">
+                        <div className="absolute top-0 right-0 w-3 h-3 bg-white transform rotate-45 translate-x-1.5 -translate-y-1.5"></div>
+                        <div className="w-full h-full flex items-center justify-center text-white font-semibold text-sm">
+                          ТЛ
+                        </div>
+                      </div>
+                      <div className="mt-1 text-center text-[10px] font-medium">Бабушка</div>
+                    </div>
                   </div>
                   
-                  <div className="interactive-node absolute top-[5%] left-[45%] transform -translate-x-1/2 -translate-y-1/2
-                                w-12 h-12 bg-background border border-primary/60 rounded-full
-                                flex items-center justify-center cursor-pointer
-                                hover:scale-110 transition-transform duration-300
-                                shadow-sm z-10">
-                    <span className="font-medium text-xs">Дедушка</span>
+                  <div className="absolute left-[45%] bottom-[70%] transform -translate-x-1/2">
+                    <div className="flex flex-col items-center">
+                      <div className="relative w-12 h-12 bg-[#7DD3FC] rounded-md overflow-hidden">
+                        <div className="absolute top-0 right-0 w-3 h-3 bg-white transform rotate-45 translate-x-1.5 -translate-y-1.5"></div>
+                        <div className="w-full h-full flex items-center justify-center text-white font-semibold text-sm">
+                          ЕЛ
+                        </div>
+                      </div>
+                      <div className="mt-1 text-center text-[10px] font-medium">Дедушка</div>
+                    </div>
                   </div>
                   
-                  <div className="interactive-node absolute top-[5%] left-[55%] transform -translate-x-1/2 -translate-y-1/2
-                                w-12 h-12 bg-background border border-primary/60 rounded-full
-                                flex items-center justify-center cursor-pointer
-                                hover:scale-110 transition-transform duration-300
-                                shadow-sm z-10">
-                    <span className="font-medium text-xs">Бабушка</span>
+                  <div className="absolute left-[55%] bottom-[70%] transform -translate-x-1/2">
+                    <div className="flex flex-col items-center">
+                      <div className="relative w-12 h-12 bg-[#FDA4AF] rounded-md overflow-hidden">
+                        <div className="absolute top-0 right-0 w-3 h-3 bg-white transform rotate-45 translate-x-1.5 -translate-y-1.5"></div>
+                        <div className="w-full h-full flex items-center justify-center text-white font-semibold text-sm">
+                          АК
+                        </div>
+                      </div>
+                      <div className="mt-1 text-center text-[10px] font-medium">Бабушка</div>
+                    </div>
                   </div>
                   
-                  <div className="interactive-node absolute top-[5%] left-[75%] transform -translate-x-1/2 -translate-y-1/2
-                                w-12 h-12 bg-background border border-primary/60 rounded-full
-                                flex items-center justify-center cursor-pointer
-                                hover:scale-110 transition-transform duration-300
-                                shadow-sm z-10">
-                    <span className="font-medium text-xs">Дедушка</span>
+                  <div className="absolute left-[75%] bottom-[70%] transform -translate-x-1/2">
+                    <div className="flex flex-col items-center">
+                      <div className="relative w-12 h-12 bg-[#7DD3FC] rounded-md overflow-hidden">
+                        <div className="absolute top-0 right-0 w-3 h-3 bg-white transform rotate-45 translate-x-1.5 -translate-y-1.5"></div>
+                        <div className="w-full h-full flex items-center justify-center text-white font-semibold text-sm">
+                          ПК
+                        </div>
+                      </div>
+                      <div className="mt-1 text-center text-[10px] font-medium">Дедушка</div>
+                    </div>
                   </div>
                   
                   {/* Линии связей */}
-                  <svg className="absolute inset-0 w-full h-full z-0" viewBox="0 0 100 100" preserveAspectRatio="none">
-                    {/* Линии к родителям */}
-                    <path d="M50,50 L35,15" stroke="currentColor" className="text-primary/60" strokeWidth="1" fill="none" />
-                    <path d="M50,50 L65,15" stroke="currentColor" className="text-primary/60" strokeWidth="1" fill="none" />
+                  <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    {/* Горизонтальная линия между родителями */}
+                    <line x1="35" y1="60" x2="65" y2="60" stroke="#cccccc" strokeWidth="1" />
                     
-                    {/* Линии к прародителям */}
-                    <path d="M35,15 L25,5" stroke="currentColor" className="text-primary/40" strokeWidth="0.75" fill="none" />
-                    <path d="M35,15 L45,5" stroke="currentColor" className="text-primary/40" strokeWidth="0.75" fill="none" />
-                    <path d="M65,15 L55,5" stroke="currentColor" className="text-primary/40" strokeWidth="0.75" fill="none" />
-                    <path d="M65,15 L75,5" stroke="currentColor" className="text-primary/40" strokeWidth="0.75" fill="none" />
+                    {/* Вертикальная линия вниз к основной персоне */}
+                    <line x1="50" y1="60" x2="50" y2="90" stroke="#cccccc" strokeWidth="1" />
+                    
+                    {/* Горизонтальные линии между бабушками/дедушками */}
+                    <line x1="25" y1="30" x2="45" y2="30" stroke="#cccccc" strokeWidth="1" />
+                    <line x1="55" y1="30" x2="75" y2="30" stroke="#cccccc" strokeWidth="1" />
+                    
+                    {/* Вертикальные линии вниз к родителям */}
+                    <line x1="35" y1="30" x2="35" y2="60" stroke="#cccccc" strokeWidth="1" />
+                    <line x1="65" y1="30" x2="65" y2="60" stroke="#cccccc" strokeWidth="1" />
                   </svg>
                 </div>
               </div>
