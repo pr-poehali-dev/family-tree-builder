@@ -4,82 +4,66 @@ import { usePersonSelection } from '@/hooks/usePersonSelection';
 import { usePersonModification } from '@/hooks/usePersonModification';
 import { useRelativeAddition } from '@/hooks/useRelativeAddition';
 
-// Новые данные для примера древа с основным пользователем, родителями и бабушками/дедушками
+// Данные для древа с кругами, как на картинке
 const initialPeople: Person[] = [
-  // Главный человек
+  // Главный человек (Вы)
   { 
     id: '1', 
     name: 'Вы', 
-    surname: 'Лебедева',
     gender: 'female',
-    initials: 'Л',
-    x: 400, 
-    y: 600,
+    x: 500, 
+    y: 500,
     isMainPerson: true
   },
   // Родители
   { 
     id: '2', 
-    name: 'Майя', 
-    surname: 'Лебедева',
+    name: 'Мама', 
     gender: 'female',
-    initials: 'МЛ',
-    photo: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-    x: 300, 
-    y: 400,
+    x: 350, 
+    y: 300,
     childrenIds: ['1']
   },
   { 
     id: '3', 
-    name: 'Иван', 
-    surname: 'Лебедев',
+    name: 'Папа', 
     gender: 'male',
-    initials: 'ИЛ',
-    x: 500, 
-    y: 400,
+    x: 650, 
+    y: 300,
     childrenIds: ['1']
   },
   // Бабушки и дедушки по материнской линии
   { 
     id: '4', 
-    name: 'Мария', 
-    surname: 'Лебедева',
+    name: 'Бабушка', 
     gender: 'female',
-    initials: 'МЛ',
-    photo: 'https://images.unsplash.com/photo-1581579438747-104c53d7fbc4?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-    x: 300, 
-    y: 200,
+    x: 250, 
+    y: 150,
     childrenIds: ['2']
   },
   { 
     id: '5', 
-    name: 'Павел', 
-    surname: 'Лебедев',
+    name: 'Дедушка', 
     gender: 'male',
-    initials: 'ПЛ',
-    x: 500, 
-    y: 200,
+    x: 450, 
+    y: 150,
     childrenIds: ['2']
   },
   // Бабушки и дедушки по отцовской линии
   { 
     id: '6', 
-    name: 'Александра', 
-    surname: 'Каленова',
+    name: 'Бабушка', 
     gender: 'female',
-    initials: 'АК',
-    x: 700, 
-    y: 200,
+    x: 550, 
+    y: 150,
     childrenIds: ['3']
   },
   { 
     id: '7', 
-    name: 'Петр', 
-    surname: 'Каленов',
+    name: 'Дедушка', 
     gender: 'male',
-    initials: 'ПК',
-    x: 900, 
-    y: 200,
+    x: 750, 
+    y: 150,
     childrenIds: ['3']
   }
 ];

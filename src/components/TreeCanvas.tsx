@@ -24,7 +24,7 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
   };
   
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (e.button === 0) { // Левая кнопка мыши
+    if (e.button === 0) {
       setIsDragging(true);
       setStartPos({ x: e.clientX - position.x, y: e.clientY - position.y });
     }
@@ -95,26 +95,26 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
                   lines.push(
                     <line 
                       key={`h-${leftParent.id}-${rightParent.id}`}
-                      x1={leftParent.x + 8}
-                      y1={leftParent.y + 16}
-                      x2={rightParent.x + 8}
-                      y2={rightParent.y + 16}
-                      stroke="#999999"
-                      strokeWidth="1"
+                      x1={leftParent.x + 12}
+                      y1={leftParent.y + 12}
+                      x2={rightParent.x + 12}
+                      y2={rightParent.y + 12}
+                      stroke="#D9A799"
+                      strokeWidth="2"
                     />
                   );
                   
                   // Центральная вертикальная линия вниз
-                  const centerX = (leftParent.x + rightParent.x) / 2 + 8;
+                  const centerX = (leftParent.x + rightParent.x) / 2 + 12;
                   lines.push(
                     <line 
                       key={`v-${leftParent.id}-${rightParent.id}-${child.id}`}
                       x1={centerX}
-                      y1={leftParent.y + 16}
-                      x2={child.x + 8}
-                      y2={child.y - 10}
-                      stroke="#999999"
-                      strokeWidth="1"
+                      y1={leftParent.y + 12}
+                      x2={child.x + 12}
+                      y2={child.y - 12}
+                      stroke="#D9A799"
+                      strokeWidth="2"
                     />
                   );
                 }
@@ -123,12 +123,12 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
                 lines.push(
                   <line 
                     key={`v-${person.id}-${childId}`}
-                    x1={person.x + 8}
-                    y1={person.y + 16}
-                    x2={child.x + 8}
-                    y2={child.y - 10}
-                    stroke="#999999"
-                    strokeWidth="1"
+                    x1={person.x + 12}
+                    y1={person.y + 12}
+                    x2={child.x + 12}
+                    y2={child.y - 12}
+                    stroke="#D9A799"
+                    strokeWidth="2"
                   />
                 );
               }
@@ -144,7 +144,7 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
   return (
     <div 
       ref={canvasRef}
-      className="relative w-full h-full overflow-hidden bg-[#f9f9f9] cursor-grab"
+      className="relative w-full h-full overflow-hidden bg-[#F5F1EC] cursor-grab"
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
