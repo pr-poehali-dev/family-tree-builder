@@ -95,40 +95,69 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
                   lines.push(
                     <line 
                       key={`h-${leftParent.id}-${rightParent.id}`}
-                      x1={leftParent.x + 12}
-                      y1={leftParent.y + 12}
-                      x2={rightParent.x + 12}
-                      y2={rightParent.y + 12}
+                      x1={leftParent.x + 24}
+                      y1={leftParent.y}
+                      x2={rightParent.x}
+                      y2={rightParent.y}
                       stroke="#D9A799"
-                      strokeWidth="2"
+                      strokeWidth="1"
                     />
                   );
                   
                   // Центральная вертикальная линия вниз
                   const centerX = (leftParent.x + rightParent.x) / 2 + 12;
+                  const parentY = leftParent.y + 24;
+                  const childY = child.y - 12;
+                  
+                  // Линии от центра к каждому родителю
                   lines.push(
                     <line 
-                      key={`v-${leftParent.id}-${rightParent.id}-${child.id}`}
-                      x1={centerX}
+                      key={`v-left-${leftParent.id}-center`}
+                      x1={leftParent.x + 24}
                       y1={leftParent.y + 12}
-                      x2={child.x + 12}
-                      y2={child.y - 12}
+                      x2={centerX}
+                      y2={parentY}
                       stroke="#D9A799"
-                      strokeWidth="2"
+                      strokeWidth="1"
+                    />
+                  );
+                  
+                  lines.push(
+                    <line 
+                      key={`v-right-${rightParent.id}-center`}
+                      x1={rightParent.x}
+                      y1={rightParent.y + 12}
+                      x2={centerX}
+                      y2={parentY}
+                      stroke="#D9A799"
+                      strokeWidth="1"
+                    />
+                  );
+                  
+                  // Линия от центра к ребенку
+                  lines.push(
+                    <line 
+                      key={`v-center-${child.id}`}
+                      x1={centerX}
+                      y1={parentY}
+                      x2={child.x + 12}
+                      y2={childY}
+                      stroke="#D9A799"
+                      strokeWidth="1"
                     />
                   );
                 }
               } else if (parents.length === 1) {
-                // Если один родитель, рисуем прямую вертикальную линию
+                // Если один родитель, рисуем прямую линию от родителя к ребенку
                 lines.push(
                   <line 
                     key={`v-${person.id}-${childId}`}
                     x1={person.x + 12}
-                    y1={person.y + 12}
+                    y1={person.y + 24}
                     x2={child.x + 12}
                     y2={child.y - 12}
                     stroke="#D9A799"
-                    strokeWidth="2"
+                    strokeWidth="1"
                   />
                 );
               }

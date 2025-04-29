@@ -36,7 +36,7 @@ const Hero = () => {
               <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-secondary/5 rounded-lg"></div>
               <div className="relative w-full h-full flex items-center justify-center">
                 <div className="family-tree-visual w-[90%] h-[90%] relative bg-[#F5F1EC] rounded-lg p-4">
-                  {/* Новая визуализация древа с кругами */}
+                  {/* Визуализация древа с кругами */}
                   
                   {/* Главная персона (Вы) */}
                   <div className="absolute left-1/2 bottom-[15%] transform -translate-x-1/2">
@@ -83,19 +83,19 @@ const Hero = () => {
                     </div>
                   </div>
                   
-                  {/* Линии связей */}
+                  {/* Линии связей - исправлены, чтобы не перекрывать плашки */}
                   <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
                     {/* Горизонтальные линии между бабушками/дедушками */}
-                    <line x1="25" y1="25" x2="45" y2="25" stroke="#D9A799" strokeWidth="1.5" />
-                    <line x1="55" y1="25" x2="75" y2="25" stroke="#D9A799" strokeWidth="1.5" />
+                    <line x1="25" y1="25" x2="45" y2="25" stroke="#D9A799" strokeWidth="1" />
+                    <line x1="55" y1="25" x2="75" y2="25" stroke="#D9A799" strokeWidth="1" />
                     
                     {/* Вертикальные линии от родителей к бабушкам/дедушкам */}
-                    <line x1="35" y1="25" x2="35" y2="55" stroke="#D9A799" strokeWidth="1.5" />
-                    <line x1="65" y1="25" x2="65" y2="55" stroke="#D9A799" strokeWidth="1.5" />
+                    <line x1="35" y1="25" x2="35" y2="47" stroke="#D9A799" strokeWidth="1" />
+                    <line x1="65" y1="25" x2="65" y2="47" stroke="#D9A799" strokeWidth="1" />
                     
                     {/* Линии от родителей к главной персоне */}
-                    <line x1="35" y1="55" x2="50" y2="85" stroke="#D9A799" strokeWidth="1.5" />
-                    <line x1="65" y1="55" x2="50" y2="85" stroke="#D9A799" strokeWidth="1.5" />
+                    <line x1="35" y1="55" x2="45" y2="75" stroke="#D9A799" strokeWidth="1" />
+                    <line x1="65" y1="55" x2="55" y2="75" stroke="#D9A799" strokeWidth="1" />
                   </svg>
                 </div>
               </div>
