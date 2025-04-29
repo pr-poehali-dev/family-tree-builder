@@ -58,6 +58,15 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
     return people.filter(p => p.childrenIds?.includes(personId));
   };
   
+  // Получаем центр узла (для линий, идущих из центра)
+  const getNodeCenter = (person: Person) => {
+    const nodeSize = 24; // примерный радиус узла
+    return {
+      x: (person.x || 0) + nodeSize,
+      y: (person.y || 0) + nodeSize
+    };
+  };
+  
   // Функция для отрисовки линий связей между людьми
   const renderConnectionLines = () => {
     const lines: JSX.Element[] = [];
@@ -81,42 +90,25 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
               const parents = findParents(childId);
               
               if (parents.length === 2) {
-                // Если два родителя, рисуем горизонтальную линию между ними
+                // Если два родителя, обрабатываем их вместе
                 const parent1 = parents[0];
                 const parent2 = parents[1];
                 
                 if (parent1.x !== undefined && parent1.y !== undefined && 
                     parent2.x !== undefined && parent2.y !== undefined) {
                   
-                  // Определяем порядок родителей (слева направо)
-                  const [leftParent, rightParent] = parent1.x < parent2.x ? [parent1, parent2] : [parent2, parent1];
+                  const parent1Center = getNodeCenter(parent1);
+                  const parent2Center = getNodeCenter(parent2);
+                  const childCenter = getNodeCenter(child);
                   
-                  // Горизонтальная линия между родителями
+                  // Прямые линии от родителей к ребенку
                   lines.push(
                     <line 
-                      key={`h-${leftParent.id}-${rightParent.id}`}
-                      x1={leftParent.x + 24}
-                      y1={leftParent.y}
-                      x2={rightParent.x}
-                      y2={rightParent.y}
-                      stroke="#D9A799"
-                      strokeWidth="1"
-                    />
-                  );
-                  
-                  // Центральная вертикальная линия вниз
-                  const centerX = (leftParent.x + rightParent.x) / 2 + 12;
-                  const parentY = leftParent.y + 24;
-                  const childY = child.y - 12;
-                  
-                  // Линии от центра к каждому родителю
-                  lines.push(
-                    <line 
-                      key={`v-left-${leftParent.id}-center`}
-                      x1={leftParent.x + 24}
-                      y1={leftParent.y + 12}
-                      x2={centerX}
-                      y2={parentY}
+                      key={`d-${parent1.id}-${childId}`}
+                      x1={parent1Center.x}
+                      y1={parent1Center.y}
+                      x2={childCenter.x}
+                      y2={childCenter.y}
                       stroke="#D9A799"
                       strokeWidth="1"
                     />
@@ -124,24 +116,11 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
                   
                   lines.push(
                     <line 
-                      key={`v-right-${rightParent.id}-center`}
-                      x1={rightParent.x}
-                      y1={rightParent.y + 12}
-                      x2={centerX}
-                      y2={parentY}
-                      stroke="#D9A799"
-                      strokeWidth="1"
-                    />
-                  );
-                  
-                  // Линия от центра к ребенку
-                  lines.push(
-                    <line 
-                      key={`v-center-${child.id}`}
-                      x1={centerX}
-                      y1={parentY}
-                      x2={child.x + 12}
-                      y2={childY}
+                      key={`d-${parent2.id}-${childId}`}
+                      x1={parent2Center.x}
+                      y1={parent2Center.y}
+                      x2={childCenter.x}
+                      y2={childCenter.y}
                       stroke="#D9A799"
                       strokeWidth="1"
                     />
@@ -149,13 +128,16 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
                 }
               } else if (parents.length === 1) {
                 // Если один родитель, рисуем прямую линию от родителя к ребенку
+                const parentCenter = getNodeCenter(person);
+                const childCenter = getNodeCenter(child);
+                
                 lines.push(
                   <line 
-                    key={`v-${person.id}-${childId}`}
-                    x1={person.x + 12}
-                    y1={person.y + 24}
-                    x2={child.x + 12}
-                    y2={child.y - 12}
+                    key={`d-${person.id}-${childId}`}
+                    x1={parentCenter.x}
+                    y1={parentCenter.y}
+                    x2={childCenter.x}
+                    y2={childCenter.y}
                     stroke="#D9A799"
                     strokeWidth="1"
                   />

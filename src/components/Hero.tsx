@@ -46,56 +46,54 @@ const Hero = () => {
                   </div>
                   
                   {/* Родители */}
-                  <div className="absolute left-[35%] bottom-[45%] transform -translate-x-1/2">
+                  <div className="absolute left-[30%] bottom-[45%] transform -translate-x-1/2">
                     <div className="w-20 h-20 rounded-full bg-white border border-[#D9A799] shadow-sm flex items-center justify-center">
                       <div className="text-[#2F5542] font-medium">Мама</div>
                     </div>
                   </div>
                   
-                  <div className="absolute left-[65%] bottom-[45%] transform -translate-x-1/2">
+                  <div className="absolute left-[70%] bottom-[45%] transform -translate-x-1/2">
                     <div className="w-20 h-20 rounded-full bg-white border border-[#D9A799] shadow-sm flex items-center justify-center">
                       <div className="text-[#2F5542] font-medium">Папа</div>
                     </div>
                   </div>
                   
                   {/* Бабушки и дедушки */}
-                  <div className="absolute left-[25%] bottom-[75%] transform -translate-x-1/2">
+                  <div className="absolute left-[20%] bottom-[75%] transform -translate-x-1/2">
                     <div className="w-16 h-16 rounded-full bg-white border border-[#D9A799] shadow-sm flex items-center justify-center">
                       <div className="text-[#2F5542] font-medium text-xs">Бабушка</div>
                     </div>
                   </div>
                   
-                  <div className="absolute left-[45%] bottom-[75%] transform -translate-x-1/2">
+                  <div className="absolute left-[40%] bottom-[75%] transform -translate-x-1/2">
                     <div className="w-16 h-16 rounded-full bg-white border border-[#D9A799] shadow-sm flex items-center justify-center">
                       <div className="text-[#2F5542] font-medium text-xs">Дедушка</div>
                     </div>
                   </div>
                   
-                  <div className="absolute left-[55%] bottom-[75%] transform -translate-x-1/2">
+                  <div className="absolute left-[60%] bottom-[75%] transform -translate-x-1/2">
                     <div className="w-16 h-16 rounded-full bg-white border border-[#D9A799] shadow-sm flex items-center justify-center">
                       <div className="text-[#2F5542] font-medium text-xs">Бабушка</div>
                     </div>
                   </div>
                   
-                  <div className="absolute left-[75%] bottom-[75%] transform -translate-x-1/2">
+                  <div className="absolute left-[80%] bottom-[75%] transform -translate-x-1/2">
                     <div className="w-16 h-16 rounded-full bg-white border border-[#D9A799] shadow-sm flex items-center justify-center">
                       <div className="text-[#2F5542] font-medium text-xs">Дедушка</div>
                     </div>
                   </div>
                   
-                  {/* Линии связей - исправлены, чтобы не перекрывать плашки */}
+                  {/* Линии связей - исправлены для соединения из центра плашек */}
                   <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
-                    {/* Горизонтальные линии между бабушками/дедушками */}
-                    <line x1="25" y1="25" x2="45" y2="25" stroke="#D9A799" strokeWidth="1" />
-                    <line x1="55" y1="25" x2="75" y2="25" stroke="#D9A799" strokeWidth="1" />
-                    
-                    {/* Вертикальные линии от родителей к бабушкам/дедушкам */}
-                    <line x1="35" y1="25" x2="35" y2="47" stroke="#D9A799" strokeWidth="1" />
-                    <line x1="65" y1="25" x2="65" y2="47" stroke="#D9A799" strokeWidth="1" />
+                    {/* Линии от бабушек и дедушек к родителям */}
+                    <line x1="20" y1="25" x2="30" y2="55" stroke="#D9A799" strokeWidth="1" />
+                    <line x1="40" y1="25" x2="30" y2="55" stroke="#D9A799" strokeWidth="1" />
+                    <line x1="60" y1="25" x2="70" y2="55" stroke="#D9A799" strokeWidth="1" />
+                    <line x1="80" y1="25" x2="70" y2="55" stroke="#D9A799" strokeWidth="1" />
                     
                     {/* Линии от родителей к главной персоне */}
-                    <line x1="35" y1="55" x2="45" y2="75" stroke="#D9A799" strokeWidth="1" />
-                    <line x1="65" y1="55" x2="55" y2="75" stroke="#D9A799" strokeWidth="1" />
+                    <line x1="30" y1="55" x2="50" y2="85" stroke="#D9A799" strokeWidth="1" />
+                    <line x1="70" y1="55" x2="50" y2="85" stroke="#D9A799" strokeWidth="1" />
                   </svg>
                 </div>
               </div>
