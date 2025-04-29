@@ -10,7 +10,7 @@ const ConnectionLines = ({ people }: ConnectionLinesProps) => {
     return people.filter(p => p.childrenIds?.includes(personId));
   };
   
-  // Получаем центр узла (для линий, идущих из центра)
+  // Получаем центр узла для линий
   const getNodeCenter = (person: Person) => {
     const nodeSize = 24; // примерный радиус узла
     return {
@@ -38,63 +38,21 @@ const ConnectionLines = ({ people }: ConnectionLinesProps) => {
             if (!processedConnections.has(connectionKey)) {
               processedConnections.add(connectionKey);
               
-              // Находим всех родителей ребенка
-              const parents = findParents(childId);
+              const parentCenter = getNodeCenter(person);
+              const childCenter = getNodeCenter(child);
               
-              if (parents.length === 2) {
-                // Если два родителя, обрабатываем их вместе
-                const parent1 = parents[0];
-                const parent2 = parents[1];
-                
-                if (parent1.x !== undefined && parent1.y !== undefined && 
-                    parent2.x !== undefined && parent2.y !== undefined) {
-                  
-                  const parent1Center = getNodeCenter(parent1);
-                  const parent2Center = getNodeCenter(parent2);
-                  const childCenter = getNodeCenter(child);
-                  
-                  // Прямые линии от родителей к ребенку
-                  lines.push(
-                    <line 
-                      key={`d-${parent1.id}-${childId}`}
-                      x1={parent1Center.x}
-                      y1={parent1Center.y}
-                      x2={childCenter.x}
-                      y2={childCenter.y}
-                      stroke="#D9A799"
-                      strokeWidth="1"
-                    />
-                  );
-                  
-                  lines.push(
-                    <line 
-                      key={`d-${parent2.id}-${childId}`}
-                      x1={parent2Center.x}
-                      y1={parent2Center.y}
-                      x2={childCenter.x}
-                      y2={childCenter.y}
-                      stroke="#D9A799"
-                      strokeWidth="1"
-                    />
-                  );
-                }
-              } else if (parents.length === 1) {
-                // Если один родитель, рисуем прямую линию от родителя к ребенку
-                const parentCenter = getNodeCenter(person);
-                const childCenter = getNodeCenter(child);
-                
-                lines.push(
-                  <line 
-                    key={`d-${person.id}-${childId}`}
-                    x1={parentCenter.x}
-                    y1={parentCenter.y}
-                    x2={childCenter.x}
-                    y2={childCenter.y}
-                    stroke="#D9A799"
-                    strokeWidth="1"
-                  />
-                );
-              }
+              // Отрисовка прямой линии от родителя к ребенку
+              lines.push(
+                <line 
+                  key={`d-${person.id}-${childId}`}
+                  x1={parentCenter.x}
+                  y1={parentCenter.y}
+                  x2={childCenter.x}
+                  y2={childCenter.y}
+                  stroke="#D9A799"
+                  strokeWidth="2"
+                />
+              );
             }
           }
         });
