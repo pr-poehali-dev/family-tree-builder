@@ -1,3 +1,4 @@
+
 import { Person } from '@/types/person';
 
 interface ConnectionLinesProps {
@@ -12,6 +13,7 @@ const ConnectionLines = ({ people }: ConnectionLinesProps) => {
   
   // Получаем центр узла для линий
   const getNodeCenter = (person: Person) => {
+    if (!person) return { x: 0, y: 0 };
     const nodeSize = 24; // примерный радиус узла
     return {
       x: (person.x || 0) + nodeSize,
@@ -21,15 +23,19 @@ const ConnectionLines = ({ people }: ConnectionLinesProps) => {
   
   // Функция для отрисовки линий связей между людьми
   const renderConnectionLines = () => {
+    if (!people || !people.length) return [];
+    
     const lines: JSX.Element[] = [];
     const processedConnections = new Set<string>();
     
     people.forEach(person => {
-      if (person.childrenIds) {
+      if (person.childrenIds && person.childrenIds.length > 0) {
         // Для каждого ребенка этого человека
         person.childrenIds.forEach(childId => {
           const child = people.find(p => p.id === childId);
-          if (child && child.x !== undefined && child.y !== undefined && 
+          if (!child) return;
+          
+          if (child.x !== undefined && child.y !== undefined && 
               person.x !== undefined && person.y !== undefined) {
             
             // Создаем уникальный ключ для соединения
@@ -51,6 +57,7 @@ const ConnectionLines = ({ people }: ConnectionLinesProps) => {
                   y2={childCenter.y}
                   stroke="#D9A799"
                   strokeWidth="2"
+                  strokeLinecap="round"
                 />
               );
             }

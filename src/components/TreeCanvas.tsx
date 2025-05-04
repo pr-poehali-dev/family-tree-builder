@@ -1,3 +1,4 @@
+
 import { useRef } from 'react';
 import { Person, RelationType } from '@/types/person';
 import { useCanvasNavigation } from '@/hooks/useCanvasNavigation';
@@ -8,7 +9,7 @@ import ZoomControls from '@/components/tree/ZoomControls';
 interface TreeCanvasProps {
   people: Person[];
   onSelectPerson: (person: Person) => void;
-  onAddRelative: (personId: string, relationType: RelationType) => void;
+  onAddRelative?: (personId: string, relationType: RelationType) => void;
 }
 
 const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) => {
@@ -33,6 +34,7 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
+      style={{ touchAction: 'none' }} // Предотвращает прокрутку на мобильных устройствах
     >
       <div 
         className="absolute"
@@ -40,6 +42,8 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
           transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
           transformOrigin: '0 0',
           transition: isDragging ? 'none' : 'transform 0.1s ease',
+          width: '100%',
+          height: '100%'
         }}
       >
         {/* Канва с семейным древом */}
