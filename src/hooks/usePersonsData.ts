@@ -1,88 +1,149 @@
-import { useState } from 'react';
-import { Person, RelationType } from '@/types/person';
-import { usePersonSelection } from '@/hooks/usePersonSelection';
-import { usePersonModification } from '@/hooks/usePersonModification';
-import { useRelativeAddition } from '@/hooks/useRelativeAddition';
 
-// Данные для древа с кругами, как на картинке
-const initialPeople: Person[] = [
-  // Главный человек (Вы)
-  { 
-    id: '1', 
-    name: 'Вы', 
-    gender: 'female',
-    x: 500, 
-    y: 500,
-    isMainPerson: true
-  },
-  // Родители
-  { 
-    id: '2', 
-    name: 'Мама', 
-    gender: 'female',
-    x: 350, 
-    y: 300,
-    childrenIds: ['1']
-  },
-  { 
-    id: '3', 
-    name: 'Папа', 
+import { useState, useEffect } from 'react';
+import { Person } from '@/types/person';
+
+// Демо-данные для древа
+const demoPersons: Person[] = [
+  {
+    id: 'person_1',
+    name: 'Иван Петров',
+    birthYear: 1950,
     gender: 'male',
-    x: 650, 
-    y: 300,
-    childrenIds: ['1']
+    generation: 0,
+    childrenIds: ['person_3', 'person_4'],
+    spouseIds: ['person_2'],
+    x: 300,
+    y: 100,
   },
-  // Бабушки и дедушки по материнской линии
-  { 
-    id: '4', 
-    name: 'Бабушка', 
+  {
+    id: 'person_2',
+    name: 'Мария Петрова',
+    birthYear: 1953,
     gender: 'female',
-    x: 250, 
-    y: 150,
-    childrenIds: ['2']
+    generation: 0,
+    childrenIds: ['person_3', 'person_4'],
+    spouseIds: ['person_1'],
+    x: 500,
+    y: 100,
   },
-  { 
-    id: '5', 
-    name: 'Дедушка', 
+  {
+    id: 'person_3',
+    name: 'Александр Петров',
+    birthYear: 1975,
     gender: 'male',
-    x: 450, 
-    y: 150,
-    childrenIds: ['2']
+    generation: 1,
+    childrenIds: ['person_5'],
+    spouseIds: [],
+    x: 200,
+    y: 250,
   },
-  // Бабушки и дедушки по отцовской линии
-  { 
-    id: '6', 
-    name: 'Бабушка', 
+  {
+    id: 'person_4',
+    name: 'Екатерина Смирнова',
+    birthYear: 1978,
     gender: 'female',
-    x: 550, 
-    y: 150,
-    childrenIds: ['3']
+    generation: 1,
+    childrenIds: ['person_6', 'person_7'],
+    spouseIds: [],
+    x: 400,
+    y: 250,
   },
-  { 
-    id: '7', 
-    name: 'Дедушка', 
+  {
+    id: 'person_5',
+    name: 'Дмитрий Петров',
+    birthYear: 2000,
     gender: 'male',
-    x: 750, 
-    y: 150,
-    childrenIds: ['3']
-  }
+    generation: 2,
+    childrenIds: [],
+    spouseIds: [],
+    x: 200,
+    y: 400,
+  },
+  {
+    id: 'person_6',
+    name: 'Анна Смирнова',
+    birthYear: 2005,
+    gender: 'female',
+    generation: 2,
+    childrenIds: [],
+    spouseIds: [],
+    x: 350,
+    y: 400,
+  },
+  {
+    id: 'person_7',
+    name: 'Михаил Смирнов',
+    birthYear: 2007,
+    gender: 'male',
+    generation: 2,
+    childrenIds: [],
+    spouseIds: [],
+    x: 450,
+    y: 400,
+  },
 ];
 
+// Хук для управления данными о персонах в древе
 export const usePersonsData = () => {
-  const [people, setPeople] = useState<Person[]>(initialPeople);
-  
-  // Используем вспомогательные хуки для различных аспектов работы с данными
-  const { selectedPerson, handleSelectPerson } = usePersonSelection(people, setPeople);
-  const { handleSavePerson } = usePersonModification(people, setPeople, selectedPerson);
-  const { handleAddRelative } = useRelativeAddition(people, setPeople, selectedPerson);
+  // Загружаем данные из localStorage при инициализации
+  const loadInitialData = (): Person[] => {
+    const savedData = localStorage.getItem('familyTreePersons');
+    if (savedData) {
+      try {
+        return JSON.parse(savedData);
+      } catch (e) {
+        console.error('Ошибка при загрузке данных из localStorage:', e);
+      }
+    }
+    return demoPersons; // Возвращаем демо-данные, если нет сохраненных
+  };
+
+  const [persons, setPersons] = useState<Person[]>(loadInitialData);
+
+  // Сохраняем данные в localStorage при изменении
+  useEffect(() => {
+    localStorage.setItem('familyTreePersons', JSON.stringify(persons));
+  }, [persons]);
+
+  // Добавление новой персоны
+  const addPerson = (person: Person) => {
+    setPersons(prevPersons => [...prevPersons, person]);
+  };
+
+  // Обновление существующей персоны
+  const updatePerson = (updatedPerson: Person) => {
+    setPersons(prevPersons =>
+      prevPersons.map(person =>
+        person.id === updatedPerson.id ? updatedPerson : person
+      )
+    );
+  };
+
+  // Удаление персоны
+  const removePerson = (personId: string) => {
+    // Сначала нужно удалить все ссылки на эту персону из других персон
+    setPersons(prevPersons => {
+      const updatedPersons = prevPersons.map(person => {
+        // Удаляем удаляемую персону из списков детей и супругов
+        const updatedChildrenIds = person.childrenIds?.filter(id => id !== personId) || [];
+        const updatedSpouseIds = person.spouseIds?.filter(id => id !== personId) || [];
+        
+        return {
+          ...person,
+          childrenIds: updatedChildrenIds,
+          spouseIds: updatedSpouseIds,
+        };
+      });
+      
+      // Затем удаляем саму персону
+      return updatedPersons.filter(person => person.id !== personId);
+    });
+  };
 
   return {
-    people,
-    selectedPerson,
-    handleSelectPerson,
-    handleSavePerson,
-    handleAddRelative
+    persons,
+    addPerson,
+    updatePerson,
+    removePerson,
   };
 };
-
-export default usePersonsData;
