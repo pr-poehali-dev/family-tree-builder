@@ -5,9 +5,10 @@ import { useState } from 'react';
 interface TreeNodeProps {
   person: Person;
   onSelect: (person: Person) => void;
+  isSelected?: boolean;
 }
 
-const TreeNode = ({ person, onSelect }: TreeNodeProps) => {
+const TreeNode = ({ person, onSelect, isSelected }: TreeNodeProps) => {
   const [isHovered, setIsHovered] = useState(false);
   
   // Защитная проверка на наличие данных
@@ -43,8 +44,13 @@ const TreeNode = ({ person, onSelect }: TreeNodeProps) => {
       >
         {/* Круглая карточка с именем */}
         <div 
-          className={`w-24 h-24 rounded-full bg-white border-2 ${isHovered ? 'border-primary shadow-lg' : 'border-[#D9A799] shadow-md'} 
-          flex items-center justify-center overflow-hidden`}
+          className={`w-24 h-24 rounded-full bg-white border-2 
+            ${isSelected 
+              ? 'border-primary shadow-lg ring-2 ring-primary/30' 
+              : isHovered 
+                ? 'border-primary/70 shadow-lg' 
+                : 'border-[#D9A799] shadow-md'} 
+            flex items-center justify-center overflow-hidden z-10`}
         >
           {person.photoUrl ? (
             <img 
@@ -68,6 +74,15 @@ const TreeNode = ({ person, onSelect }: TreeNodeProps) => {
             </div>
           )}
         </div>
+        
+        {/* Имя под кружком для длинных имен */}
+        {person.name && person.name.length > 15 && (
+          <div className="mt-2 text-center max-w-[120px]">
+            <p className="text-sm font-medium truncate" title={person.name}>
+              {person.name}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

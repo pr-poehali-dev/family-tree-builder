@@ -1,79 +1,153 @@
 
+import React, { memo, useEffect, useRef } from 'react';
 import { Person } from '@/types/person';
 
 interface ConnectionLinesProps {
-  people: Person[];
+  persons: Person[];
+  scale: number;
 }
 
-const ConnectionLines = ({ people }: ConnectionLinesProps) => {
-  // Функция для поиска родителей персоны по ID
-  const findParents = (personId: string) => {
-    return people.filter(p => p.childrenIds?.includes(personId));
-  };
-  
-  // Получаем центр узла для линий
-  const getNodeCenter = (person: Person) => {
-    if (!person) return { x: 0, y: 0 };
-    const nodeSize = 24; // примерный радиус узла
-    return {
-      x: (person.x || 0) + nodeSize,
-      y: (person.y || 0) + nodeSize
-    };
-  };
-  
-  // Функция для отрисовки линий связей между людьми
-  const renderConnectionLines = () => {
-    if (!people || !people.length) return [];
+const ConnectionLines = memo(({ persons, scale }: ConnectionLinesProps) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    if (!canvasRef.current || !persons.length) return;
     
-    const lines: JSX.Element[] = [];
-    const processedConnections = new Set<string>();
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
     
-    people.forEach(person => {
-      if (person.childrenIds && person.childrenIds.length > 0) {
-        // Для каждого ребенка этого человека
+    // Устанавливаем размеры canvas на основе контейнера
+    const container = canvas.parentElement;
+    if (!container) return;
+    
+    canvas.width = container.clientWidth;
+    canvas.height = container.clientHeight;
+    
+    // Очищаем холст
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Настраиваем стиль линий
+    ctx.strokeStyle = '#D9A799';
+    ctx.lineWidth = 2 * scale;
+    ctx.lineCap = 'round';
+    
+    // Маска для обходки плашек (линии будут проходить под плашками)
+    ctx.globalCompositeOperation = 'destination-over';
+    
+    // Отрисовка связей между узлами
+    persons.forEach(person => {
+      if (!person.x || !person.y) return;
+      
+      // Рисуем связи с детьми
+      if (person.childrenIds?.length) {
         person.childrenIds.forEach(childId => {
-          const child = people.find(p => p.id === childId);
-          if (!child) return;
-          
-          if (child.x !== undefined && child.y !== undefined && 
-              person.x !== undefined && person.y !== undefined) {
-            
-            // Создаем уникальный ключ для соединения
-            const connectionKey = [person.id, childId].sort().join('-');
-            
-            if (!processedConnections.has(connectionKey)) {
-              processedConnections.add(connectionKey);
-              
-              const parentCenter = getNodeCenter(person);
-              const childCenter = getNodeCenter(child);
-              
-              // Отрисовка прямой линии от родителя к ребенку
-              lines.push(
-                <line 
-                  key={`d-${person.id}-${childId}`}
-                  x1={parentCenter.x}
-                  y1={parentCenter.y}
-                  x2={childCenter.x}
-                  y2={childCenter.y}
-                  stroke="#D9A799"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              );
-            }
+          const child = persons.find(p => p.id === childId);
+          if (child?.x && child?.y) {
+            drawConnection(ctx, person.x, person.y, child.x, child.y);
+          }
+        });
+      }
+      
+      // Рисуем связи с супругами
+      if (person.spouseIds?.length) {
+        person.spouseIds.forEach(spouseId => {
+          const spouse = persons.find(p => p.id === spouseId);
+          if (spouse?.x && spouse?.y) {
+            // Для супругов используем пунктирную линию
+            drawSpouseConnection(ctx, person.x, person.y, spouse.x, spouse.y);
           }
         });
       }
     });
     
-    return lines;
+    // Восстанавливаем режим отрисовки
+    ctx.globalCompositeOperation = 'source-over';
+  }, [persons, scale]);
+  
+  // Функция для рисования связи родитель-ребенок
+  const drawConnection = (
+    ctx: CanvasRenderingContext2D,
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number
+  ) => {
+    const padding = 15 * scale; // Отступ от узла
+    
+    // Начинаем путь
+    ctx.beginPath();
+    
+    if (Math.abs(y2 - y1) > 50) {
+      // Вертикальная линия с изгибами (для связи поколений)
+      const midY = (y1 + y2) / 2;
+      
+      // Начинаем от нижней части родительского узла
+      ctx.moveTo(x1, y1 + padding);
+      
+      // Промежуточная точка между поколениями
+      ctx.lineTo(x1, midY);
+      ctx.lineTo(x2, midY);
+      ctx.lineTo(x2, y2 - padding);
+    } else {
+      // Прямая линия для связей на одном уровне
+      ctx.moveTo(x1, y1 + padding);
+      ctx.lineTo(x2, y2 - padding);
+    }
+    
+    ctx.stroke();
   };
-
+  
+  // Функция для рисования связи между супругами
+  const drawSpouseConnection = (
+    ctx: CanvasRenderingContext2D,
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number
+  ) => {
+    const padding = 12 * scale; // Отступ от узла
+    
+    // Сохраняем текущие настройки
+    ctx.save();
+    
+    // Настраиваем пунктир для супругов
+    ctx.setLineDash([5, 3]);
+    ctx.strokeStyle = '#9b87f5';
+    
+    // Начинаем путь
+    ctx.beginPath();
+    
+    // Горизонтальная линия между супругами
+    const midY = (y1 + y2) / 2;
+    
+    if (Math.abs(x2 - x1) > 60) {
+      // Если супруги далеко, рисуем прямую линию
+      ctx.moveTo(x1 + padding, y1);
+      ctx.lineTo(x2 - padding, y2);
+    } else {
+      // Если супруги рядом, рисуем арку
+      const controlY = midY - 30 * scale; // Контрольная точка для изгиба
+      
+      ctx.moveTo(x1, y1 - padding);
+      ctx.quadraticCurveTo((x1 + x2) / 2, controlY, x2, y2 - padding);
+    }
+    
+    ctx.stroke();
+    
+    // Восстанавливаем настройки
+    ctx.restore();
+  };
+  
   return (
-    <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
-      {renderConnectionLines()}
-    </svg>
+    <canvas
+      ref={canvasRef}
+      className="absolute top-0 left-0 w-full h-full pointer-events-none"
+      style={{ zIndex: 1 }} // Убедимся, что линии под узлами
+    />
   );
-};
+});
+
+ConnectionLines.displayName = 'ConnectionLines';
 
 export default ConnectionLines;

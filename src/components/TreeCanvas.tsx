@@ -1,20 +1,22 @@
 
-import { useRef } from 'react';
-import { Person, RelationType } from '@/types/person';
+import { useState, useRef, useEffect } from 'react';
+import { Person } from '@/types/person';
+import TreeNode from './TreeNode';
+import ConnectionLines from './tree/ConnectionLines';
 import { useCanvasNavigation } from '@/hooks/useCanvasNavigation';
-import ConnectionLines from '@/components/tree/ConnectionLines';
-import TreeNodes from '@/components/tree/TreeNodes';
-import ZoomControls from '@/components/tree/ZoomControls';
+import ZoomControls from './tree/ZoomControls';
 
 interface TreeCanvasProps {
-  people: Person[];
+  persons: Person[];
   onSelectPerson: (person: Person) => void;
-  onAddRelative?: (personId: string, relationType: RelationType) => void;
+  selectedPersonId?: string;
 }
 
-const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) => {
+const TreeCanvas = ({ persons, onSelectPerson, selectedPersonId }: TreeCanvasProps) => {
   const canvasRef = useRef<HTMLDivElement>(null);
+  const [layoutedPersons, setLayoutedPersons] = useState<Person[]>([]);
   
+  // Используем хук для навигации по канве
   const {
     scale,
     position,
@@ -26,38 +28,113 @@ const TreeCanvas = ({ people, onSelectPerson, onAddRelative }: TreeCanvasProps) 
     resetView
   } = useCanvasNavigation(canvasRef);
   
-  return (
-    <div 
-      ref={canvasRef}
-      className="relative w-full h-full overflow-hidden bg-[#F5F1EC] cursor-grab"
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
-      style={{ touchAction: 'none' }} // Предотвращает прокрутку на мобильных устройствах
-    >
-      <div 
-        className="absolute"
-        style={{
-          transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
-          transformOrigin: '0 0',
-          transition: isDragging ? 'none' : 'transform 0.1s ease',
-          width: '100%',
-          height: '100%'
-        }}
-      >
-        {/* Канва с семейным древом */}
-        <div className="relative min-w-[1200px] min-h-[800px]">
-          {/* Линии связей между узлами */}
-          <ConnectionLines people={people} />
+  // Распределение узлов по канве при изменении данных
+  useEffect(() => {
+    if (!persons.length) return;
+    
+    // Функция для расчета позиций узлов
+    const layoutTree = () => {
+      const nodeWidth = 100; // Ширина узла с отступами
+      const nodeHeight = 120; // Высота узла с отступами
+      
+      // Группируем персон по поколениям
+      const generations: { [key: number]: Person[] } = {};
+      
+      // Определяем поколения на основе связей
+      persons.forEach(person => {
+        const generation = person.generation || 0;
+        if (!generations[generation]) {
+          generations[generation] = [];
+        }
+        generations[generation].push(person);
+      });
+      
+      // Сортируем поколения
+      const sortedGenerations = Object.keys(generations)
+        .map(Number)
+        .sort((a, b) => a - b);
+      
+      // Расставляем узлы по горизонтали внутри поколения
+      sortedGenerations.forEach(genNumber => {
+        const genPersons = generations[genNumber];
+        const totalWidth = genPersons.length * nodeWidth;
+        
+        genPersons.forEach((person, index) => {
+          // Рассчитываем горизонтальное положение
+          const x = (index + 0.5) * nodeWidth;
           
-          {/* Узлы людей */}
-          <TreeNodes people={people} onSelectPerson={onSelectPerson} />
+          // Вертикальное положение на основе поколения
+          const y = genNumber * nodeHeight + 100;
+          
+          person.x = x;
+          person.y = y;
+        });
+      });
+      
+      return [...persons];
+    };
+    
+    // Применяем расчет позиций
+    setLayoutedPersons(layoutTree());
+  }, [persons]);
+  
+  // Центрирование на выбранной персоне
+  useEffect(() => {
+    if (!selectedPersonId || !canvasRef.current) return;
+    
+    const selectedPerson = layoutedPersons.find(p => p.id === selectedPersonId);
+    if (!selectedPerson || !selectedPerson.x || !selectedPerson.y) return;
+    
+    // Логика центрирования выбранного узла здесь...
+  }, [selectedPersonId, layoutedPersons]);
+  
+  return (
+    <div className="relative w-full h-full overflow-hidden bg-secondary/5">
+      <div
+        ref={canvasRef}
+        className={`relative w-full h-full ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        onTouchStart={handleMouseDown}
+        onTouchMove={handleMouseMove}
+        onTouchEnd={handleMouseUp}
+      >
+        <div
+          className="absolute origin-top-left transition-transform"
+          style={{
+            transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
+            willChange: 'transform'
+          }}
+        >
+          {/* Рисуем линии связей под узлами */}
+          <ConnectionLines persons={layoutedPersons} scale={scale} />
+          
+          {/* Отрисовываем узлы древа поверх линий */}
+          <div className="relative" style={{ zIndex: 2 }}>
+            {layoutedPersons.map(person => (
+              <div
+                key={person.id}
+                className="absolute transform -translate-x-1/2 -translate-y-1/2"
+                style={{
+                  left: person.x,
+                  top: person.y,
+                }}
+              >
+                <TreeNode
+                  person={person}
+                  onSelect={onSelectPerson}
+                  isSelected={person.id === selectedPersonId}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
       
-      {/* Элементы управления масштабом */}
-      <ZoomControls 
+      {/* Контроли масштабирования */}
+      <ZoomControls
         scale={scale}
         setScale={setScale}
         resetView={resetView}
