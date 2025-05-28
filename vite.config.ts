@@ -1,17 +1,16 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import { fileURLToPath } from 'url';
-import { dirname, resolve } from 'path';
+import {defineConfig} from "vite";
+import react from "@vitejs/plugin-react-swc";
+import path from "path";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react()],
+export default defineConfig(({mode}) => ({
+  plugins: [
+    react(),
+  ].filter(Boolean),
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
+      "@": path.resolve(__dirname, "./src"),
     },
   },
   server: {
@@ -22,4 +21,4 @@ export default defineConfig({
       overlay: false // Disables the error overlay if you only want console errors
     }
   },
-});
+}));
